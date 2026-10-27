@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#0f1b2d">
 <title>ME業務ダッシュボード</title>
 <script>try{var t=localStorage.getItem('medash_theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>/* パソコンのフォルダから開いたときだけ、同じフォルダの dashboard_data.js を読み込む */
+if(location.protocol==='file:'){document.write('<script src="dashboard_data.js"><\/script>');}</script>
 <style>
 :root{
   --bg:#f3f5f8; --surface:#ffffff; --ink:#0e1726; --muted:#5a6577; --line:#e2e7ee; --line2:#edf1f5; --track:#e9edf3;
@@ -135,6 +137,33 @@ svg .ln{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}sv
 .drop.on{display:flex}
 .drop div{border:3px dashed #fff;border-radius:24px;padding:48px 56px;text-align:center}
 .tabbar{display:none}
+button.kpi{text-align:left;font:inherit;color:inherit;cursor:pointer}
+button.kpi:hover{border-color:var(--accent)}
+.wbar{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.btn.sm{height:36px;padding:0 12px;font-size:13px}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;align-items:start}
+.w{padding:0;overflow:hidden}
+.w.open{grid-column:1 / -1}
+.w.lv-b-alert{box-shadow:inset 4px 0 0 var(--red-dot)}.w.lv-b-warn{box-shadow:inset 4px 0 0 var(--yel-bar)}
+.w-h{display:flex;align-items:center;gap:12px;width:100%;padding:16px 18px;border:0;background:none;text-align:left;min-height:72px}
+.w-h:hover{background:var(--bg)}
+.w-ic{width:36px;height:36px;border-radius:10px;background:var(--bg);display:grid;place-items:center;flex:none}
+.w-ic svg{width:20px;height:20px}
+.w-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.w-m > b{font-size:15.5px}
+.w-s{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:13px;color:var(--muted)}
+.w-k b{color:var(--ink);font-size:15px}.w-k.lv-alert b,.w-k b.lv-alert{color:var(--red)}.w-k.lv-warn b,.w-k b.lv-warn{color:var(--yel)}.w-k b.lv-ok{color:var(--grn)}
+.w-x{flex-basis:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.w-c{flex:none;color:var(--muted);transition:transform .15s}.w-c svg{width:20px;height:20px;display:block}
+.w.open .w-c{transform:rotate(180deg)}
+.w-b{padding:4px 18px 18px;border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:12px}
+.w-b > *:first-child{margin-top:12px}
+.w-l{text-align:right;font-size:13px;font-weight:600}.w-l a{text-decoration:none}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--dash)}
+.dot-ok{background:var(--grn-bar)}.dot-warn{background:var(--yel-bar)}.dot-alert{background:var(--red-dot)}
+.day{display:flex;flex-direction:column}.day .dh{font-weight:700;font-size:13.5px;padding:8px 0 2px}
+.evl li{grid-template-columns:92px minmax(0,1fr)}.evl li .tm{font-size:13px;color:var(--muted);font-weight:600}
+.evl li .x{display:flex;flex-direction:column}.evl li .x small{font-size:12px;color:var(--muted)}
 .login{max-width:420px;margin:6vh auto 0;width:100%;display:flex;flex-direction:column;gap:14px}
 .login h2{font-size:20px}
 .login input{width:100%;font:inherit;font-size:40px;letter-spacing:.5em;text-align:center;padding:14px 10px 14px 24px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
@@ -151,6 +180,8 @@ svg .ln{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}sv
   main{padding:14px 14px 96px;gap:14px}
   .top h1{font-size:22px}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .wgrid{grid-template-columns:1fr;gap:10px}
+  .w-h{padding:12px 14px}.w-b{padding:2px 14px 14px}
   .kpi{padding:12px 14px;gap:4px}.kpi .v b{font-size:30px}
   .card{padding:14px;border-radius:14px}
   .todo li{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"sev c a" "src due a";row-gap:2px}
@@ -210,7 +241,7 @@ const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(
 const md = s => { const m = String(s).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/); return m ? `${+m[2]}/${+m[3]}` : String(s); };
 const wd = s => { const m = String(s).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/); return m ? '日月火水木金土'[new Date(+m[1], m[2] - 1, +m[3]).getDay()] : ''; };
 const yen = v => num(v) === null ? '—' : '¥' + num(v).toLocaleString('ja-JP');
-const SHEETS = ['概要', '要対応', '今日の状況', '残量', '残量推移', '在庫', '予定', '記録', '写真', '日次記録'];
+const SHEETS = ['概要', '要対応', '今日の状況', '残量', '残量推移', '在庫', '予定', 'カレンダー', '記録', '写真', '日次記録'];
 const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const IC = {
   dash: SVG('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
@@ -221,10 +252,17 @@ const IC = {
   file: SVG('<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h7M9 17h5"/>'),
   moon: SVG('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
   cam: SVG('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
-  check: SVG('<path d="M5 12l4 4 10-10"/>')
+  check: SVG('<path d="M5 12l4 4 10-10"/>'),
+  chev: SVG('<path d="M6 9l6 6 6-6"/>'),
+  alert: SVG('<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/>'),
+  cal: SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+  drop: SVG('<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'),
+  list: SVG('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-width="3"/>')
 };
 
-const S = { model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '' };
+const S = { model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '' };
+let OPEN = new Set((() => { try { return JSON.parse(localStorage.getItem('medash_open') || '[]'); } catch (e) { return []; } })());
+const saveOpen = () => { try { localStorage.setItem('medash_open', JSON.stringify([...OPEN])); } catch (e) { } };
 /* ---------- ログイン（在庫管理のユーザー番号。管理者・使用者、その日のうちだけ有効） ---------- */
 function loadAuth() { try { const a = JSON.parse(localStorage.getItem('medash_auth') || 'null'); return a && a.day === todayStr() ? a : null; } catch (e) { return null; } }
 function logout(msg) {
@@ -329,7 +367,7 @@ const rows = n => S.model[n] || [];
 function render() {
   renderNav();
   const main = $('#main');
-  if (API_URL && !S.auth && S.source !== 'excel') { main.innerHTML = loginView(); const i = $('#loginId'); if (i && !S.busy) i.focus(); return; }
+  if (API_URL && !S.auth && S.source !== 'excel' && S.source !== 'local') { main.innerHTML = loginView(); const i = $('#loginId'); if (i && !S.busy) i.focus(); return; }
   if (!S.model) {
     main.innerHTML = `${topBar(null)}${S.error ? `<div class="banner err">${esc(S.error)}</div>` : ''}
       <div class="card"><h2>データがまだありません</h2>
@@ -338,16 +376,35 @@ function render() {
     return;
   }
   const s = sumMap();
+  const W = widgets(s);
+  const allOpen = W.every(w => OPEN.has(w.id));
   main.innerHTML = `
     ${topBar(s)}
     ${S.error ? `<div class="banner err">${esc(S.error)}<button class="btn" data-act="xlsx">${IC.file}Excelから表示</button></div>` : ''}
     ${S.source === 'excel' ? `<div class="banner info">Excelファイルの内容を表示しています（${esc(s['更新日時'] || '')} 時点）。自動更新はされません。</div>` : ''}
+    ${S.source === 'local' ? `<div class="banner info">このパソコンに同期されたデータ（${esc(S.localAt)} 時点）を表示しています。インターネットがなくても見られますが、最新でない場合があります。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
     ${kpis(s)}
-    <div class="row2">${todoCard()}${oxyCard()}</div>
-    <div class="grid3">${todayCard()}${planCard()}${stockCard(s)}</div>
-    <div class="grid3">${consCard()}${logCard()}${picCard()}</div>`;
+    <div class="wbar"><span class="muted">項目を押すと詳しい内容が開きます</span><button class="btn sm" data-act="${allOpen ? 'closeall' : 'openall'}">${allOpen ? 'すべて閉じる' : 'すべて開く'}</button></div>
+    <div class="wgrid">${W.map(widgetHtml).join('')}</div>`;
 }
 
+/* 1つの項目（ウィジェット）：見出し＋要約。押すと詳細が開く */
+function widgetHtml(w) {
+  const open = OPEN.has(w.id);
+  return `<section class="card w ${open ? 'open' : ''} ${w.level ? 'lv-b-' + w.level : ''}" id="w-${w.id}">
+    <button class="w-h" data-act="toggle" data-w="${w.id}" aria-expanded="${open}" aria-controls="wb-${w.id}">
+      <span class="w-ic" style="color:${w.color || 'var(--accent)'}">${w.icon}</span>
+      <span class="w-m"><b>${esc(w.title)}</b><span class="w-s">${w.summary}</span></span>
+      <span class="w-c" aria-hidden="true">${IC.chev}</span>
+    </button>
+    ${open ? `<div class="w-b" id="wb-${w.id}">${w.body}${w.link ? `<div class="w-l"><a href="${esc(w.link[0])}">${esc(w.link[1])} ›</a></div>` : ''}</div>` : ''}
+  </section>`;
+}
+
+/* 新しい情報を足すときは、この一覧に1つ追加するだけ */
+function widgets(s) {
+  return [todoW(s), oxyW(), todayW(), planW(), stockW(s), consW(), logW(), picW()];
+}
 function loginView() {
   return `<div class="login card">
     <h2>ログイン</h2>
@@ -370,8 +427,8 @@ function topBar(s) {
   const stale = s && isStale(s['更新日時']);
   return `<header class="top">
     <div class="ttl"><h1>ダッシュボード</h1><div class="sub">${date}${s ? '　データ ' + esc(s['更新日時'] || '—') + ' 時点' : ''}</div></div>
-    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
-    ${API_URL ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
+    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}このパソコンのデータ</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
+    ${API_URL && S.auth && S.source !== 'local' && S.source !== 'excel' ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
     <button class="btn" data-act="xlsx" title="Excelから表示">${IC.file}<span class="hide-sp">Excel</span></button>
     <button class="btn" data-act="theme" aria-label="表示の切り替え">${IC.moon}</button>
     ${S.auth ? `<span class="userpill"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></span>`
@@ -386,54 +443,142 @@ function kpis(s) {
   const oxyCls = oxyD === null ? '' : oxyD <= 3 ? 'lv-alert' : oxyD <= 7 ? 'lv-warn' : 'lv-ok';
   const nAll = (num(s['至急']) || 0) + (num(s['注意']) || 0) + (num(s['未実施']) || 0);
   return `<section class="kpis" aria-label="今日の概要">
-    <div class="card kpi"><span class="l">要対応</span><div class="v"><b>${nAll}</b><span>件</span></div>
-      <div class="tags"><span class="tag sev-至急">至急 ${esc(s['至急'] || 0)}</span><span class="tag sev-注意">注意 ${esc(s['注意'] || 0)}</span><span class="tag sev-未実施">未実施 ${esc(s['未実施'] || 0)}</span></div></div>
-    <div class="card kpi"><span class="l">本日の点検</span><div class="v"><b>${pct}</b><span>%</span></div><div class="bar"><i style="width:${pct}%"></i></div>
-      <span class="s">ラウンド ${esc(s['ラウンド_完了'] || 0)}/${esc(s['ラウンド_総数'] || 0)}　医療ガス ${esc(s['医療ガス_完了'] || 0)}/${esc(s['医療ガス_総数'] || 0)} 項目</span></div>
-    <div class="card kpi"><span class="l">酸素 最短の残り日数</span><div class="v"><b class="${oxyCls}">${oxyD === null ? '—' : oxyD >= 100 ? '100+' : oxyD}</b><span>日</span></div><span class="s">${esc(s['酸素_最短場所'] || '')}</span></div>
-    <div class="card kpi"><span class="l">在庫 要発注</span><div class="v"><b>${esc(s['在庫_要発注'] || 0)}</b><span>品目</span></div><span class="s">発注中 ${esc(s['在庫_発注中'] || 0)}件　今月の発注額 ${yen(s['在庫_今月発注額'])}</span></div>
+    <button class="card kpi" data-act="openw" data-w="todo"><span class="l">要対応</span><div class="v"><b>${nAll}</b><span>件</span></div>
+      <div class="tags"><span class="tag sev-至急">至急 ${esc(s['至急'] || 0)}</span><span class="tag sev-注意">注意 ${esc(s['注意'] || 0)}</span><span class="tag sev-未実施">未実施 ${esc(s['未実施'] || 0)}</span></div></button>
+    <button class="card kpi" data-act="openw" data-w="today"><span class="l">本日の点検</span><div class="v"><b>${pct}</b><span>%</span></div><div class="bar"><i style="width:${pct}%"></i></div>
+      <span class="s">ラウンド ${esc(s['ラウンド_完了'] || 0)}/${esc(s['ラウンド_総数'] || 0)}　医療ガス ${esc(s['医療ガス_完了'] || 0)}/${esc(s['医療ガス_総数'] || 0)} 項目</span></button>
+    <button class="card kpi" data-act="openw" data-w="oxy"><span class="l">酸素 最短の残り日数</span><div class="v"><b class="${oxyCls}">${oxyD === null ? '—' : oxyD >= 100 ? '100+' : oxyD}</b><span>日</span></div><span class="s">${esc(s['酸素_最短場所'] || '')}</span></button>
+    <button class="card kpi" data-act="openw" data-w="stock"><span class="l">在庫 要発注</span><div class="v"><b>${esc(s['在庫_要発注'] || 0)}</b><span>品目</span></div><span class="s">発注中 ${esc(s['在庫_発注中'] || 0)}件　今月の発注額 ${yen(s['在庫_今月発注額'])}</span></button>
   </section>`;
 }
 
 function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock }[src] || ''; }
-function todoCard() {
-  let list = rows('要対応');
+const dot = lv => `<i class="dot dot-${lv}"></i>`;
+function todoW(s) {
+  const all = rows('要対応');
+  let list = all;
   if (S.filter !== 'すべて') list = list.filter(r => r['業務'] === S.filter);
   const max = S.showAll ? list.length : 10;
-  const li = list.slice(0, max).map(r => {
-    const sev = r['緊急度'], src = r['業務'], href = link(src);
-    return `<li><span class="sev"><span class="tag sev-${esc(sev)}">${esc(sev)}</span></span><span class="src"><span class="tag src-${esc(src)}">${esc(src)}</span></span>
-      <span class="c"><b>${esc(r['内容'])}</b>${r['詳細'] ? `<span>　${esc(r['詳細'])}</span>` : ''}</span>
-      <span class="due ${esc(sev)}">${esc(r['期限'])}</span>
-      <span class="a">${href ? `<a href="${esc(href)}">開く</a>` : ''}</span></li>`;
-  }).join('');
-  return `<section class="card todo-card" aria-labelledby="h-todo">
-    <div class="hd"><h2 id="h-todo">要対応　<span class="muted" style="font-size:13px;font-weight:500">緊急度の高い順</span></h2>
-      <div class="chips">${['すべて', 'ラウンド', '医療ガス', '在庫'].map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div></div>
-    ${list.length ? `<ul class="todo">${li}</ul>` : '<p class="empty">対応が必要なものはありません</p>'}
-    ${list.length > max ? `<div class="more"><button class="btn" data-act="more">残り ${list.length - max} 件を表示</button></div>` : ''}
-  </section>`;
+  const top = all.find(r => r['緊急度'] === '至急') || all.find(r => r['緊急度'] === '注意');
+  const body = `<div class="chips" style="margin-bottom:8px">${['すべて', 'ラウンド', '医療ガス', '在庫'].map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div>
+    ${list.length ? `<ul class="todo">${list.slice(0, max).map(r => {
+      const sev = r['緊急度'], src = r['業務'], href = link(src);
+      return `<li><span class="sev"><span class="tag sev-${esc(sev)}">${esc(sev)}</span></span><span class="src"><span class="tag src-${esc(src)}">${esc(src)}</span></span>
+        <span class="c"><b>${esc(r['内容'])}</b>${r['詳細'] ? `<span>　${esc(r['詳細'])}</span>` : ''}</span>
+        <span class="due ${esc(sev)}">${esc(r['期限'])}</span><span class="a">${href ? `<a href="${esc(href)}">開く</a>` : ''}</span></li>`;
+    }).join('')}</ul>` : '<p class="empty">対応が必要なものはありません</p>'}
+    ${list.length > max ? `<div class="more"><button class="btn" data-act="more">残り ${list.length - max} 件を表示</button></div>` : ''}`;
+  const n = k => num(s[k]) || 0;
+  return { id: 'todo', title: '要対応', icon: IC.alert, color: n('至急') ? 'var(--red)' : n('注意') ? 'var(--yel)' : 'var(--grn)',
+    level: n('至急') ? 'alert' : n('注意') ? 'warn' : '',
+    summary: `<span class="tags"><span class="tag sev-至急">至急 ${n('至急')}</span><span class="tag sev-注意">注意 ${n('注意')}</span><span class="tag sev-未実施">未実施 ${n('未実施')}</span></span>${top ? `<span class="w-x">最も急ぐもの：${esc(top['内容'])}</span>` : '<span class="w-x">対応が必要なものはありません</span>'}`,
+    body };
 }
 
-function oxyCard() {
+function oxyW() {
   const ox = rows('残量').filter(r => r['業務'] === '医療ガス' && r['種類'] === '酸素')
     .sort((a, b) => (num(a['残り日数']) ?? 999) - (num(b['残り日数']) ?? 999));
   const names = [...new Set(rows('残量推移').map(r => r['名称']))];
   if (S.series >= names.length) S.series = 0;
-  return `<section class="card oxy-card" aria-labelledby="h-oxy">
-    <div class="hd" style="margin:0"><h2 id="h-oxy">酸素 あと何日使えるか</h2>${LINKS.gas ? `<a href="${esc(LINKS.gas)}">医療ガス点検へ</a>` : ''}</div>
-    ${ox.length ? ox.map(r => {
-      const d = num(r['残り日数']), lv = r['状態'] || (d === null ? '' : d <= 3 ? 'alert' : d <= 7 ? 'warn' : 'ok');
-      const w = d === null ? 0 : Math.min(100, Math.round(d / 14 * 100));
-      return `<div class="oxy"><div class="t"><span>${esc(r['名称'])}</span><b class="lv-${esc(lv)}">${d === null ? '—' : d >= 100 ? '100+' : d}<small> 日</small></b></div>
+  const lvOf = r => { const d = num(r['残り日数']); return r['状態'] || (d === null ? '' : d <= 3 ? 'alert' : d <= 7 ? 'warn' : 'ok'); };
+  const days = d => d === null ? '—' : d >= 100 ? '100+' : d;
+  const body = `${ox.length ? ox.map(r => {
+      const d = num(r['残り日数']), lv = lvOf(r), w = d === null ? 0 : Math.min(100, Math.round(d / 14 * 100));
+      return `<div class="oxy"><div class="t"><span>${esc(r['名称'])}</span><b class="lv-${esc(lv)}">${days(d)}<small> 日</small></b></div>
         <div class="bar"><i class="lv-${esc(lv)}" style="width:${w}%"></i></div>
         <span class="s">${esc(r['現在値'])}${esc(r['単位'])}${r['1日使用量'] !== '' ? '・1日 ' + esc(r['1日使用量']) + esc(r['単位']) : ''}${r['予測日'] ? '・下限 ' + esc(r['下限']) + esc(r['単位']) + ' に ' + md(r['予測日']) + '頃' : ''}</span></div>`;
     }).join('') : '<p class="empty">酸素のデータがありません</p>'}
     ${names.length ? `<div class="chart"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="muted" style="font-size:13px;font-weight:600">過去30日</span>
       <select data-act="series" aria-label="グラフの対象">${names.map((n, i) => `<option value="${i}" ${i === S.series ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
       ${lineChart(rows('残量推移').filter(r => r['名称'] === names[S.series]))}
-      <span class="muted" style="font-size:12px">黄色の点＝交換・補充　赤の点線＝下限</span></div>` : ''}
-  </section>`;
+      <span class="muted" style="font-size:12px">黄色の点＝交換・補充　赤の点線＝下限</span></div>` : ''}`;
+  const lvs = ox.map(lvOf);
+  return { id: 'oxy', title: '酸素 あと何日使えるか', icon: IC.gas, color: 'var(--t-gas)',
+    level: lvs.includes('alert') ? 'alert' : lvs.includes('warn') ? 'warn' : '',
+    summary: ox.length ? ox.slice(0, 3).map(r => `<span class="w-k">${dot(lvOf(r))}${esc(String(r['名称']).replace(' 酸素ボンベ', '').replace(' 液体酸素', ''))} <b class="lv-${esc(lvOf(r))}">${days(num(r['残り日数']))}日</b></span>`).join('') : '<span class="w-x">データがありません</span>',
+    body, link: LINKS.gas ? [LINKS.gas, '医療ガス点検へ'] : null };
+}
+
+function todayW() {
+  const st = rows('今日の状況');
+  const ward = st.filter(r => r['区分'] === '病棟'), bg = st.filter(r => r['区分'] === '血液ガス'), gas = st.filter(r => r['業務'] === '医療ガス');
+  const cls = r => (num(r['異常数']) || 0) > 0 ? 'st-bad' : 'st-' + r['状態'];
+  const done = a => a.filter(r => r['状態'] === '済').length;
+  const bad = st.reduce((n, r) => n + (num(r['異常数']) || 0), 0);
+  const body = `${ward.length ? `<div class="blk"><div class="t"><b class="r">ラウンド　病棟</b><span class="muted">${done(ward)} / ${ward.length}</span></div>
+      <div class="wards">${ward.map(r => `<span class="st ${cls(r)}">${esc(r['場所'])}<br>${esc(r['点検者'] || (r['状態'] === '済' ? '済' : '未'))}</span>`).join('')}</div></div>` : ''}
+    ${bg.length ? `<div class="blk"><div class="t"><b class="r">ラウンド　血液ガス</b><span class="muted">${done(bg)} / ${bg.length}</span></div>
+      <div class="bgs">${bg.map(r => `<span class="st ${cls(r)}">${esc(r['場所'])}</span>`).join('')}</div></div>` : ''}
+    ${gas.length ? `<div class="blk"><div class="t"><b class="g">医療ガス点検</b><span class="muted">${done(gas)} / ${gas.length} か所</span></div>
+      <div class="gasrows">${gas.map(r => {
+        const d = num(r['完了数']) || 0, t = num(r['総数']) || 0, b2 = num(r['異常数']) || 0;
+        return `<span>${esc(r['場所'])}</span><div class="bar"><i style="width:${t ? Math.round(d / t * 100) : 0}%"></i></div>
+          <span class="r ${b2 ? 'bad' : d === t && t ? 'ok' : ''}">${b2 ? '異常' + b2 : d === t && t ? '済' : d + '/' + t}</span>`;
+      }).join('')}</div></div>` : ''}
+    ${!st.length ? '<p class="empty">データがありません</p>' : ''}`;
+  return { id: 'today', title: '今日の点検', icon: IC.round, color: 'var(--t-round)', level: bad ? 'alert' : '',
+    summary: `<span class="w-k">病棟 <b>${done(ward)}/${ward.length}</b></span><span class="w-k">血ガス <b>${done(bg)}/${bg.length}</b></span><span class="w-k">医療ガス <b>${done(gas)}/${gas.length}</b>か所</span>${bad ? `<span class="w-k lv-alert"><b>異常 ${bad}</b></span>` : ''}`,
+    body };
+}
+
+function planW() {
+  const today = todayStr();
+  const cal = rows('カレンダー'), sys = rows('予定');
+  const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
+  const dates = [...new Set(cal.map(r => r['日付']).concat(sys.map(r => r['日付'])))].filter(Boolean).sort();
+  const todayCal = cal.filter(r => r['日付'] === today);
+  const now = new Date(); const hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const next = todayCal.find(r => r['開始'] && r['開始'] >= hm) || todayCal.find(r => r['終日']);
+  const body = dates.length ? dates.map(d => {
+    const items = cal.filter(r => r['日付'] === d).sort((a, b) => (a['開始'] || '') < (b['開始'] || '') ? -1 : 1)
+      .map(r => `<li class="ev"><span class="tm">${r['終日'] ? '終日' : esc(r['開始']) + (r['終了'] ? '–' + esc(r['終了']) : '')}</span><span class="x"><b>${esc(r['件名'])}</b><small>${esc(r['カレンダー'])}${r['場所'] ? '・' + esc(r['場所']) : ''}</small></span></li>`)
+      .concat(sys.filter(r => r['日付'] === d).map(r => `<li class="ev"><span class="tm">見込み</span><span class="x"><b>${esc(r['内容'])}</b><small style="color:${color[r['業務']] || 'var(--muted)'}">${esc(r['業務'])}</small></span></li>`));
+    return `<div class="day"><div class="dh">${md(d)}（${wd(d)}）${d === today ? '<span class="tag sev-注意" style="margin-left:6px">今日</span>' : ''}</div><ul class="list evl">${items.join('')}</ul></div>`;
+  }).join('') : '<p class="empty">予定はありません</p>';
+  return { id: 'plan', title: '予定（今日から7日間）', icon: IC.cal, color: 'var(--accent)',
+    summary: `<span class="w-k">今日の予定 <b>${todayCal.length}</b>件</span>${next ? `<span class="w-x">次：${next['終日'] ? '終日' : esc(next['開始'])} ${esc(next['件名'])}</span>` : ''}<span class="w-k">交換・期限の見込み <b>${sys.length}</b>件</span>`,
+    body };
+}
+
+function stockW(s) {
+  const need = rows('在庫').filter(r => r['状態'] === '在庫切れ' || r['状態'] === '要発注');
+  const out = need.filter(r => r['状態'] === '在庫切れ').length;
+  const body = `<div class="stockk"><div class="hot"><span>要発注</span><b>${esc(s['在庫_要発注'] || 0)}</b></div><div><span>発注中</span><b>${esc(s['在庫_発注中'] || 0)}</b></div><div><span>今月の発注額</span><b style="font-size:16px">${yen(s['在庫_今月発注額'])}</b></div></div>
+    ${need.length ? `<ul class="list stl">${need.map(r => `<li><span class="n">${esc(r['物品名'])}</span><span class="q ${r['状態'] === '在庫切れ' ? 'lv-alert' : 'lv-warn'}">在庫 ${esc(r['在庫数'])}</span><span class="p">発注点 ${esc(r['発注点'])}</span></li>`).join('')}</ul>` : '<p class="empty">発注が必要な物品はありません</p>'}
+    <span class="muted" style="font-size:12px;display:block;margin-top:8px">在庫の評価額 ${yen(s['在庫_評価額'])}</span>`;
+  return { id: 'stock', title: '在庫', icon: IC.stock, color: 'var(--t-stock)', level: out ? 'alert' : need.length ? 'warn' : '',
+    summary: `<span class="w-k">要発注 <b>${esc(s['在庫_要発注'] || 0)}</b></span>${out ? `<span class="w-k lv-alert">在庫切れ <b>${out}</b></span>` : ''}<span class="w-k">発注中 <b>${esc(s['在庫_発注中'] || 0)}</b></span><span class="w-k">今月 <b>${yen(s['在庫_今月発注額'])}</b></span>`,
+    body, link: LINKS.stock ? [LINKS.stock, '在庫管理（発注カート）へ'] : null };
+}
+
+function consW() {
+  const c = rows('残量').filter(r => r['業務'] === 'ラウンド').sort((a, b) => (num(a['残り日数']) ?? 999) - (num(b['残り日数']) ?? 999));
+  const al = c.filter(r => r['状態'] === 'alert'), wa = c.filter(r => r['状態'] === 'warn');
+  const body = c.length ? `<ul class="list cons">${c.map(r => {
+      const d = num(r['残り日数']);
+      return `<li><span>${esc(r['名称'])}</span><span class="v lv-${esc(r['状態'])}">${esc(r['現在値'])}${esc(r['単位'])}</span><span class="d lv-${esc(r['状態'])}">${d === null ? '—' : d <= 0 ? '交換' : 'あと' + d + '日'}</span></li>`;
+    }).join('')}</ul>` : '<p class="empty">データがありません</p>';
+  const first = al[0] || wa[0];
+  return { id: 'cons', title: '血液ガス 消耗品', icon: IC.drop, color: 'var(--t-round)', level: al.length ? 'alert' : wa.length ? 'warn' : '',
+    summary: `<span class="w-k lv-alert">交換 <b>${al.length}</b></span><span class="w-k lv-warn">注意 <b>${wa.length}</b></span>${first ? `<span class="w-x">${esc(first['名称'])} ${esc(first['現在値'])}${esc(first['単位'])}</span>` : ''}`,
+    body, link: LINKS.round ? [LINKS.round, 'ラウンド点検へ'] : null };
+}
+
+function logW() {
+  const l = rows('記録');
+  const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
+  const body = l.length ? `<ul class="list log">${l.slice(0, 20).map(r => `<li><span class="tm">${esc(r['時刻'])}</span><span style="color:${color[r['業務']] || 'inherit'};font-weight:600">${esc(r['業務'])}</span><span>${esc(r['点検者'])}　${esc(r['内容'])}</span></li>`).join('')}</ul>` : '<p class="empty">今日の記録はまだありません</p>';
+  return { id: 'log', title: '今日の記録', icon: IC.list, color: 'var(--muted)',
+    summary: `<span class="w-k"><b>${l.length}</b>件</span>${l[0] ? `<span class="w-x">最新 ${esc(l[0]['時刻'])} ${esc(l[0]['点検者'])} ${esc(l[0]['内容'])}</span>` : ''}`, body };
+}
+
+function picW() {
+  const p = rows('写真'), days = rows('日次記録').slice(-30);
+  const body = `${p.length ? `<div class="pics">${p.map(r => `<div class="pic">${IC.cam}<span><b>${esc(r['場所'])} ${esc(r['内容'])}</b><br><span class="muted">${esc(r['業務'])}・${esc(r['点検者'])} ${esc(r['時刻'])}</span></span></div>`).join('')}</div>` : '<p class="empty">写真はありません（異常時に撮影されます）</p>'}
+    ${days.length >= 2 ? `<div class="chart" style="margin-top:12px"><span class="muted" style="font-size:13px;font-weight:600">点検完了率（23:59時点・直近${days.length}日）</span>
+      ${lineChart(days.map(d => ({ '日付': d['日付'], '値': d['点検完了率'], '下限': '' })), { max: 100, noEvents: true })}</div>` : ''}`;
+  return { id: 'pic', title: '本日の写真・点検完了率', icon: IC.cam, color: 'var(--muted)',
+    summary: `<span class="w-k">写真 <b>${p.length}</b>枚</span>${p[0] ? `<span class="w-x">${esc(p[0]['場所'])} ${esc(p[0]['内容'])}</span>` : ''}`, body };
 }
 
 function lineChart(pts, opt) {
@@ -453,74 +598,6 @@ function lineChart(pts, opt) {
   if (!opt.noEvents) pts.forEach((p, i) => { if (i && p.v > pts[i - 1].v) g += `<circle class="ev" cx="${sx(p.d)}" cy="${sy(p.v)}" r="4"/>`; });
   g += `<text x="${L}" y="${H - 4}">${md(pts[0].d)}</text><text x="${W - R}" y="${H - 4}" text-anchor="end">${md(pts[pts.length - 1].d)}</text>`;
   return g + '</svg>';
-}
-
-function todayCard() {
-  const st = rows('今日の状況');
-  const ward = st.filter(r => r['区分'] === '病棟'), bg = st.filter(r => r['区分'] === '血液ガス'), gas = st.filter(r => r['業務'] === '医療ガス');
-  const cls = r => (num(r['異常数']) || 0) > 0 ? 'st-bad' : 'st-' + r['状態'];
-  const cnt = a => `${a.filter(r => r['状態'] === '済').length} / ${a.length}`;
-  return `<section class="card" aria-labelledby="h-today"><div class="hd"><h2 id="h-today">今日の点検</h2></div>
-    ${ward.length ? `<div class="blk"><div class="t"><b class="r">ラウンド　病棟</b><span class="muted">${cnt(ward)}</span></div>
-      <div class="wards">${ward.map(r => `<span class="st ${cls(r)}">${esc(r['場所'])}<br>${esc(r['点検者'] || (r['状態'] === '済' ? '済' : '未'))}</span>`).join('')}</div></div>` : ''}
-    ${bg.length ? `<div class="blk"><div class="t"><b class="r">ラウンド　血液ガス</b><span class="muted">${cnt(bg)}</span></div>
-      <div class="bgs">${bg.map(r => `<span class="st ${cls(r)}">${esc(r['場所'])}</span>`).join('')}</div></div>` : ''}
-    ${gas.length ? `<div class="blk"><div class="t"><b class="g">医療ガス点検</b><span class="muted">${cnt(gas)} か所</span></div>
-      <div class="gasrows">${gas.map(r => {
-        const d = num(r['完了数']) || 0, t = num(r['総数']) || 0, bad = num(r['異常数']) || 0;
-        return `<span>${esc(r['場所'])}</span><div class="bar"><i style="width:${t ? Math.round(d / t * 100) : 0}%"></i></div>
-          <span class="r ${bad ? 'bad' : d === t && t ? 'ok' : ''}">${bad ? '異常' + bad : d === t && t ? '済' : d + '/' + t}</span>`;
-      }).join('')}</div></div>` : ''}
-    ${!st.length ? '<p class="empty">データがありません</p>' : ''}
-  </section>`;
-}
-
-function planCard() {
-  const p = rows('予定');
-  const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
-  return `<section class="card" aria-labelledby="h-plan"><div class="hd"><h2 id="h-plan">これから7日間</h2></div>
-    ${p.length ? `<ol class="list plan">${p.map(r => `<li><span class="d">${md(r['日付'])}<span>${wd(r['日付'])}</span></span>
-      <span class="x"><b>${esc(r['内容'])}</b><small style="color:${color[r['業務']] || 'var(--muted)'}">${esc(r['業務'])}</small></span></li>`).join('')}</ol>` : '<p class="empty">予定はありません</p>'}
-  </section>`;
-}
-
-function stockCard(s) {
-  const need = rows('在庫').filter(r => r['状態'] === '在庫切れ' || r['状態'] === '要発注').slice(0, 6);
-  return `<section class="card" aria-labelledby="h-stock"><div class="hd"><h2 id="h-stock">在庫</h2>${LINKS.stock ? `<a href="${esc(LINKS.stock)}">在庫管理へ</a>` : ''}</div>
-    <div class="stockk"><div class="hot"><span>要発注</span><b>${esc(s['在庫_要発注'] || 0)}</b></div><div><span>発注中</span><b>${esc(s['在庫_発注中'] || 0)}</b></div><div><span>今月の発注額</span><b style="font-size:16px">${yen(s['在庫_今月発注額'])}</b></div></div>
-    ${need.length ? `<ul class="list stl">${need.map(r => `<li><span class="n">${esc(r['物品名'])}</span><span class="q ${r['状態'] === '在庫切れ' ? 'lv-alert' : 'lv-warn'}">在庫 ${esc(r['在庫数'])}</span><span class="p">発注点 ${esc(r['発注点'])}</span></li>`).join('')}</ul>` : '<p class="empty">発注が必要な物品はありません</p>'}
-    <span class="muted" style="font-size:12px;display:block;margin-top:8px">在庫の評価額 ${yen(s['在庫_評価額'])}</span>
-    ${LINKS.stock ? `<a class="big" href="${esc(LINKS.stock)}">発注カートを開く</a>` : ''}
-  </section>`;
-}
-
-function consCard() {
-  const c = rows('残量').filter(r => r['業務'] === 'ラウンド').sort((a, b) => (num(a['残り日数']) ?? 999) - (num(b['残り日数']) ?? 999)).slice(0, 8);
-  return `<section class="card" aria-labelledby="h-cons"><div class="hd"><h2 id="h-cons">血液ガス 消耗品</h2>${LINKS.round ? `<a href="${esc(LINKS.round)}">ラウンド点検へ</a>` : ''}</div>
-    ${c.length ? `<ul class="list cons">${c.map(r => {
-      const d = num(r['残り日数']);
-      return `<li><span>${esc(r['名称'])}</span><span class="v lv-${esc(r['状態'])}">${esc(r['現在値'])}${esc(r['単位'])}</span><span class="d lv-${esc(r['状態'])}">${d === null ? '—' : d <= 0 ? '交換' : 'あと' + d + '日'}</span></li>`;
-    }).join('')}</ul>` : '<p class="empty">データがありません</p>'}
-  </section>`;
-}
-
-function logCard() {
-  const l = rows('記録').slice(0, 10);
-  const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
-  return `<section class="card" aria-labelledby="h-log"><div class="hd"><h2 id="h-log">今日の記録</h2></div>
-    ${l.length ? `<ul class="list log">${l.map(r => `<li><span class="tm">${esc(r['時刻'])}</span><span style="color:${color[r['業務']] || 'inherit'};font-weight:600">${esc(r['業務'])}</span><span>${esc(r['点検者'])}　${esc(r['内容'])}</span></li>`).join('')}</ul>` : '<p class="empty">今日の記録はまだありません</p>'}
-  </section>`;
-}
-
-function picCard() {
-  const p = rows('写真');
-  const days = rows('日次記録').slice(-30);
-  return `<section class="card" aria-labelledby="h-pic"><div class="hd"><h2 id="h-pic">本日の写真</h2><span class="muted" style="font-size:13px">${p.length} 枚</span></div>
-    ${p.length ? `<div class="pics">${p.slice(0, 6).map(r => `<div class="pic">${IC.cam}<span><b>${esc(r['場所'])} ${esc(r['内容'])}</b><br><span class="muted">${esc(r['業務'])}・${esc(r['点検者'])} ${esc(r['時刻'])}</span></span></div>`).join('')}</div>`
-      : '<p class="empty">写真はありません（異常時に撮影されます）</p>'}
-    ${days.length >= 2 ? `<div class="chart" style="margin-top:12px"><span class="muted" style="font-size:13px;font-weight:600">点検完了率（23:59時点・直近${days.length}日）</span>
-      ${lineChart(days.map(d => ({ '日付': d['日付'], '値': d['点検完了率'], '下限': '' })), { max: 100, noEvents: true })}</div>` : ''}
-  </section>`;
 }
 
 function renderNav() {
@@ -547,7 +624,15 @@ document.addEventListener('click', e => {
   const a = b.dataset.act;
   if (a === 'refresh') loadApi(true);
   else if (a === 'logout') logout('');
-  else if (a === 'tologin') { S.model = null; S.source = ''; render(); }
+  else if (a === 'toggle' || a === 'openw') {
+    const id = b.dataset.w;
+    if (a === 'openw') OPEN.add(id); else OPEN.has(id) ? OPEN.delete(id) : OPEN.add(id);
+    saveOpen(); render();
+    if (a === 'openw') { const el = document.getElementById('w-' + id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+  else if (a === 'openall') { widgets(sumMap()).forEach(w => OPEN.add(w.id)); saveOpen(); render(); }
+  else if (a === 'closeall') { OPEN.clear(); saveOpen(); render(); }
+  else if (a === 'tologin') { S.model = null; S.source = ''; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
   else if (a === 'xlsx') reopenExcel();
   else if (a === 'filter') { S.filter = b.dataset.f; S.showAll = false; render(); }
   else if (a === 'more') { S.showAll = true; render(); }
@@ -562,7 +647,12 @@ document.addEventListener('change', e => { if (e.target.dataset.act === 'series'
 
 /* 起動：前回の内容を即表示 → 集約データを取得 → 数分ごとに自動更新 */
 S.auth = API_URL ? loadAuth() : null;
-if (!API_URL || S.auth) {
+if (location.protocol === 'file:' && window.DASHBOARD_DATA && window.DASHBOARD_DATA.model) {
+  S.model = window.DASHBOARD_DATA.model; S.source = 'local'; S.localAt = window.DASHBOARD_DATA.exportedAt || '';
+  S.sourceLabel = 'このパソコンのデータ';
+}
+if (S.source === 'local') { /* 同期済みデータを表示中 */ }
+else if (!API_URL || S.auth) {
   try { const c = JSON.parse(localStorage.getItem('medash_model') || 'null'); if (c) { S.model = c.m; S.source = c.src; S.sourceLabel = c.label + '（前回）'; } } catch (e) { }
 } else { try { localStorage.removeItem('medash_model'); } catch (e) { } }
 render();
@@ -571,8 +661,8 @@ function dayCheck() {
   return true;
 }
 if (API_URL) {
-  if (S.auth) loadApi(false);
-  setInterval(() => { if (dayCheck() && S.auth && S.source !== 'excel' && document.visibilityState === 'visible') loadApi(false); }, AUTO_REFRESH_MIN * 60000);
+  if (S.auth && S.source !== 'local') loadApi(false);
+  setInterval(() => { if (dayCheck() && S.auth && S.source !== 'excel' && S.source !== 'local' && document.visibilityState === 'visible') loadApi(false); }, AUTO_REFRESH_MIN * 60000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dayCheck(); });
 }
 </script>
