@@ -48,7 +48,27 @@ a{color:var(--accent)}
 .nav .off{color:#7f8da3;cursor:default}.nav .off small{margin-left:auto;font-size:11px}
 .nav .cnt{margin-left:auto;font-size:12px;background:#3a4a63;color:#fff;border-radius:99px;padding:1px 8px}
 .nav svg{width:20px;height:20px;flex:none}
-.srcbox{margin-top:auto;background:#18263c;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.minical{margin-top:auto;background:#18263c;border-radius:14px;padding:12px 12px 10px}
+.mc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.mc-h b{font-size:14px}
+.mc-h button{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:var(--nav-ink);font-size:18px}
+.mc-h button:hover{background:var(--nav-hi)}
+.mc-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.mc-g .wk{font-size:10.5px;color:var(--nav-muted);padding-bottom:2px}
+.mc-g .wk.su,.mc-g .su{color:#ff9aa2}.mc-g .wk.sa,.mc-g .sa{color:#9fb8ff}
+.mc-g button{position:relative;height:28px;border:0;border-radius:7px;background:transparent;color:var(--nav-ink);font-size:12px;padding:0}
+.mc-g button:hover{background:var(--nav-hi)}
+.mc-g button.out{opacity:.35}
+.mc-g button.td{background:#2f4ac0;color:#fff;font-weight:700}
+.mc-g button.sel{box-shadow:inset 0 0 0 2px #9fb8ff}
+.mc-g button i{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);display:flex;gap:2px}
+.mc-g button i b{width:4px;height:4px;border-radius:50%;background:#7fd3da}.mc-g button i b.sys{background:#ffd36b}
+.mc-l{display:flex;gap:10px;font-size:10.5px;color:var(--nav-muted);margin-top:6px}
+.mc-l span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:1px;background:#7fd3da}
+.mc-l span.sys::before{background:#ffd36b}
+.panel .minical-sp{display:none}
+.src-ok{color:#7fd9a2}.src-ng{color:#ffd36b}
+.srcbox{margin-top:10px;background:#18263c;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
 .srcbox .h{color:var(--nav-muted)}
 .srcbox .r{display:flex;justify-content:space-between;gap:8px}
 .srcbox .old{color:#ffd36b}
@@ -65,7 +85,7 @@ main{flex:1;min-width:0;padding:26px 30px 40px;display:flex;flex-direction:colum
 .btn svg{width:18px;height:18px}
 .btn.pri{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .banner{border-radius:12px;padding:12px 16px;font-size:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.banner.err{background:var(--red-bg);color:var(--red)}.banner.info{background:var(--accent-soft);color:var(--accent)}
+.banner.err{background:var(--red-bg);color:var(--red)}.banner.warn-b{background:var(--yel-bg);color:var(--yel)}.banner.info{background:var(--accent-soft);color:var(--accent)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}
 .card h2{margin:0;font-size:17px}
 .card .hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
@@ -210,6 +230,7 @@ button.kpi:hover{border-color:var(--accent)}
   .minis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .mini{min-height:48px;padding:8px 10px}.mini .ml{font-size:13px}
   .ph{padding:12px 14px}.pb{padding:10px 14px 14px}
+  .panel .minical-sp{display:block;background:var(--nav);color:var(--nav-ink);border-radius:12px;padding:10px;--nav-muted:#a9b6ca;--nav-hi:#23324a;--nav-ink:#e8edf5}
   .w-h{padding:12px 14px}.w-b{padding:2px 14px 14px}
   .kpi{padding:12px 14px;gap:4px}.kpi .v b{font-size:30px}
   .card{padding:14px;border-radius:14px}
@@ -233,6 +254,7 @@ button.kpi:hover{border-color:var(--accent)}
       <div><b>ME業務アプリ</b><span>臨床工学部 保守管理センター</span></div>
     </div>
     <div class="nav" id="nav"></div>
+    <div class="minical" id="minical"></div>
     <div class="srcbox" id="srcbox"></div>
   </nav>
   <main id="main"><p class="loading">読み込んでいます…</p></main>
@@ -289,7 +311,8 @@ const IC = {
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-width="3"/>')
 };
 
-const S = { model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '' };
+const S = { model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
+  folderMode: location.protocol === 'file:', dir: null, dirName: '', fileInfo: '', calMonth: '', calDay: '' };
 S.sel = (() => { try { return localStorage.getItem('medash_sel') || 'plan'; } catch (e) { return 'plan'; } })();
 let OPEN = new Set((() => { try { return JSON.parse(localStorage.getItem('medash_open') || '[]'); } catch (e) { return []; } })());
 const saveOpen = () => { try { localStorage.setItem('medash_open', JSON.stringify([...OPEN])); } catch (e) { } };
@@ -377,6 +400,63 @@ async function reopenExcel() {
     return loadExcelFile(await h.getFile());
   } catch (e) { return pickExcel(); }
 }
+/* ---------- フォルダの最新Excel（パソコンのフォルダに置いた index.html から使う） ---------- */
+async function saveDir(h) { try { const db = await idb(); db.transaction('h', 'readwrite').objectStore('h').put(h, 'dir'); } catch (e) { } }
+async function getDir() { try { const db = await idb(); return await new Promise(res => { const q = db.transaction('h').objectStore('h').get('dir'); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch (e) { return null; } }
+/* フォルダの中から一番新しいダッシュボード用のExcelを探す（名前に「ダッシュボード」を含むものを優先） */
+async function latestInDir(dir) {
+  let best = null, bestAny = null;
+  for await (const [name, h] of dir.entries()) {
+    if (h.kind !== 'file' || !/\.xlsx$/i.test(name) || name.startsWith('~$')) continue;
+    const f = await h.getFile();
+    if (!bestAny || f.lastModified > bestAny.lastModified) bestAny = f;
+    if (/ダッシュボード/.test(name) && (!best || f.lastModified > best.lastModified)) best = f;
+  }
+  return best || bestAny;
+}
+async function loadFromDir(interactive) {
+  const dir = S.dir || await getDir();
+  if (!dir) return interactive ? chooseDir() : false;
+  try {
+    let perm = await dir.queryPermission({ mode: 'read' });
+    if (perm !== 'granted' && interactive) perm = await dir.requestPermission({ mode: 'read' });
+    if (perm !== 'granted') { S.dir = dir; S.dirName = dir.name; render(); return false; }
+    S.dir = dir; S.dirName = dir.name;
+    const f = await latestInDir(dir);
+    if (!f) { S.error = `フォルダ「${dir.name}」にExcelファイルがありません`; render(); return false; }
+    await loadExcelFile(f);
+    const t = new Date(f.lastModified);
+    S.fileInfo = `${f.name}（${t.getMonth() + 1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())} 保存）`;
+    S.sourceLabel = 'フォルダの最新Excel';
+    render();
+    return true;
+  } catch (e) { S.error = 'フォルダを読めませんでした：' + e.message; render(); return false; }
+}
+async function chooseDir() {
+  if (!window.showDirectoryPicker) { $('#xlsxInput').click(); return false; }
+  try {
+    const dir = await showDirectoryPicker({ mode: 'read', id: 'medash' });
+    await saveDir(dir); S.dir = dir;
+    return loadFromDir(true);
+  } catch (e) { if (e.name !== 'AbortError') { S.error = e.message; render(); } return false; }
+}
+function folderView() {
+  const can = !!window.showDirectoryPicker;
+  return `<div class="login card">
+    <h2>フォルダの最新Excelを表示</h2>
+    <p class="muted" style="margin:0;font-size:14px">このファイルと同じように、ダッシュボードのExcelが届くフォルダを指定すると、その中の<b>一番新しいExcel</b>を自動で表示します。</p>
+    ${S.error ? `<div class="msg">${esc(S.error)}</div>` : ''}
+    ${can ? (S.dirName
+      ? `<button class="btn pri" data-act="dirload" style="justify-content:center;height:52px">${IC.file}「${esc(S.dirName)}」の最新Excelを表示</button>
+         <button class="btn" data-act="dirpick" style="justify-content:center">別のフォルダを指定する</button>`
+      : `<button class="btn pri" data-act="dirpick" style="justify-content:center;height:52px">${IC.file}Excelが届くフォルダを指定する（最初の1回）</button>`)
+      : `<p class="muted" style="font-size:13px">このブラウザはフォルダの指定に対応していません。Edge または Chrome で開くと、次回から自動で表示できます。</p>`}
+    <button class="btn" data-act="xlsx" style="justify-content:center">Excelファイルを選んで表示</button>
+    ${API_URL ? `<button class="btn" data-act="tologin" style="justify-content:center">ログインして最新を表示（インターネット接続時）</button>` : ''}
+    <p class="muted" style="font-size:12.5px;margin:0">ブラウザに「ファイルの閲覧を許可しますか」と聞かれたら「<b>訪問のたびに許可する</b>」を選ぶと、次からはこのファイルを開くだけで表示されます。</p>
+  </div>`;
+}
+
 $('#xlsxInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) loadExcelFile(f); });
 let dragN = 0;
 addEventListener('dragenter', e => { if ([...e.dataTransfer.types].includes('Files')) { dragN++; $('#drop').classList.add('on'); } });
@@ -397,6 +477,7 @@ const rows = n => S.model[n] || [];
 function render() {
   renderNav();
   const main = $('#main');
+  if (S.folderMode && !S.model && !S.wantLogin) { main.innerHTML = folderView(); return; }
   if (API_URL && !S.auth && S.source !== 'excel' && S.source !== 'local') { main.innerHTML = loginView(); const i = $('#loginId'); if (i && !S.busy) i.focus(); return; }
   if (!S.model) {
     main.innerHTML = `${topBar(null)}${S.error ? `<div class="banner err">${esc(S.error)}</div>` : ''}
@@ -412,7 +493,8 @@ function render() {
   main.innerHTML = `
     ${topBar(s)}
     ${S.error ? `<div class="banner err">${esc(S.error)}<button class="btn" data-act="xlsx">${IC.file}Excelから表示</button></div>` : ''}
-    ${S.source === 'excel' ? `<div class="banner info">Excelファイルの内容を表示しています（${esc(s['更新日時'] || '')} 時点）。自動更新はされません。</div>` : ''}
+    ${(() => { const st = sourceStatus(s); return st.ng.length && !st.stale ? `<div class="banner warn-b">⚠ ${st.ng.map(n => esc(n.name)).join('・')}のデータを、最新の集約（${esc(st.latest.slice(11, 16))}）で取得できませんでした。表示しているのは${st.ng.map(n => esc(n.name) + ' ' + esc(n.at ? n.at.slice(11, 16) : '—')).join('、')}時点の内容です。</div>` : ''; })()}
+    ${S.source === 'excel' ? `<div class="banner info">${S.fileInfo ? 'フォルダの最新Excel：' + esc(S.fileInfo) + '　' : 'Excelファイルの'}内容を表示しています（データ ${esc(s['更新日時'] || '')} 時点）。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
     ${S.source === 'local' ? `<div class="banner info">${window.DASHBOARD_EMBEDDED ? 'このファイルに保存されたデータ' : 'このパソコンに同期されたデータ'}（${esc(S.localAt)} 時点）を表示しています。インターネットがなくても見られますが、最新ではありません。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
     ${kpis(s)}
     ${miniTiles(map)}
@@ -478,7 +560,8 @@ function topBar(s) {
   const stale = s && isStale(s['更新日時']);
   return `<header class="top">
     <div class="ttl"><h1>ダッシュボード</h1><div class="sub">${date}${s ? '　データ ' + esc(s['更新日時'] || '—') + ' 時点' : ''}</div></div>
-    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
+    ${S.source === 'excel' && S.dir ? `<button class="btn" data-act="dirload">${IC.refresh}<span class="hide-sp">フォルダを読み直す</span></button>` : ''}
+    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : sourceStatus(s).ng.length ? `<span class="pill warn">一部取得できず</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
     ${API_URL && S.auth && S.source !== 'local' && S.source !== 'excel' ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
     <button class="btn" data-act="xlsx" title="Excelから表示">${IC.file}<span class="hide-sp">Excel</span></button>
     <button class="btn" data-act="theme" aria-label="表示の切り替え">${IC.moon}</button>
@@ -580,10 +663,13 @@ function refDay() {
 }
 function planW() {
   const today = refDay();
-  const cal = rows('カレンダー'), sys = rows('予定');
+  const end7 = (() => { const [y, m, d] = today.split('-').map(Number); const t = new Date(y, m - 1, d + 6); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; })();
+  const inRange = r => S.calDay ? r['日付'] === S.calDay : (r['日付'] >= today && r['日付'] <= end7);
+  const calAll = rows('カレンダー');
+  const cal = calAll.filter(inRange), sys = rows('予定').filter(inRange);
   const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
   const dates = [...new Set(cal.map(r => r['日付']).concat(sys.map(r => r['日付'])))].filter(Boolean).sort();
-  const todayCal = cal.filter(r => r['日付'] === today);
+  const todayCal = calAll.filter(r => r['日付'] === today);
   const now = new Date(); const hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
   const next = todayCal.find(r => r['開始'] && r['開始'] >= hm) || todayCal.find(r => r['終日']);
   const body = dates.length ? dates.map(d => {
@@ -591,10 +677,11 @@ function planW() {
       .map(r => `<li class="ev"><span class="tm">${r['終日'] ? '終日' : esc(r['開始']) + (r['終了'] ? '–' + esc(r['終了']) : '')}</span><span class="x"><b>${esc(r['件名'])}</b><small>${esc(r['カレンダー'])}${r['場所'] ? '・' + esc(r['場所']) : ''}</small></span></li>`)
       .concat(sys.filter(r => r['日付'] === d).map(r => `<li class="ev"><span class="tm">見込み</span><span class="x"><b>${esc(r['内容'])}</b><small style="color:${color[r['業務']] || 'var(--muted)'}">${esc(r['業務'])}</small></span></li>`));
     return `<div class="day"><div class="dh">${md(d)}（${wd(d)}）${d === today ? '<span class="tag sev-注意" style="margin-left:6px">今日</span>' : ''}</div><ul class="list evl">${items.join('')}</ul></div>`;
-  }).join('') : '<p class="empty">予定はありません</p>';
-  return { id: 'plan', title: '予定（今日から7日間）', icon: IC.cal, color: 'var(--accent)', mini: `今日 <b>${todayCal.length}</b>件`,
+  }).join('') : `<p class="empty">${S.calDay ? md(S.calDay) + '（' + wd(S.calDay) + '）の予定はありません' : '予定はありません'}</p>`;
+  const head = S.calDay ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${md(S.calDay)}（${wd(S.calDay)}）の予定</b><button class="btn sm" data-act="calreset">今日から7日間に戻る</button></div>` : '';
+  return { id: 'plan', title: S.calDay ? `予定（${md(S.calDay)}）` : '予定（今日から7日間）', icon: IC.cal, color: 'var(--accent)', mini: `今日 <b>${todayCal.length}</b>件`,
     summary: `<span class="w-k">今日の予定 <b>${todayCal.length}</b>件</span>${next ? `<span class="w-x">次：${next['終日'] ? '終日' : esc(next['開始'])} ${esc(next['件名'])}</span>` : ''}<span class="w-k">交換・期限の見込み <b>${sys.length}</b>件</span>`,
-    body };
+    body: `<div class="minical-sp">${miniCalHtml()}</div>${head}${body}` };
 }
 
 function stockW(s) {
@@ -658,7 +745,33 @@ function lineChart(pts, opt) {
   return g + '</svg>';
 }
 
+/* 小さな1か月カレンダー。点＝その日の予定（青緑：カレンダー、黄：交換・期限の見込み）。日付を押すとその日の予定を表示 */
+function miniCalHtml() {
+  if (!S.model) return '';
+  const today = refDay();
+  const ym = S.calMonth || today.slice(0, 7);
+  const [y, m] = ym.split('-').map(Number);
+  const first = new Date(y, m - 1, 1), startW = first.getDay(), nd = new Date(y, m, 0).getDate();
+  const ev = {}, sy = {};
+  rows('カレンダー').forEach(r => ev[r['日付']] = (ev[r['日付']] || 0) + 1);
+  rows('予定').forEach(r => sy[r['日付']] = (sy[r['日付']] || 0) + 1);
+  let cells = '';
+  for (let i = 0; i < 42; i++) {
+    const t = new Date(y, m - 1, 1 - startW + i);
+    const ds = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+    if (i >= 35 && t.getMonth() !== m - 1) break;
+    const cls = [t.getMonth() !== m - 1 ? 'out' : '', ds === today ? 'td' : '', ds === S.calDay ? 'sel' : '', t.getDay() === 0 ? 'su' : t.getDay() === 6 ? 'sa' : ''].join(' ');
+    const dots = (ev[ds] ? '<b></b>' : '') + (sy[ds] ? '<b class="sys"></b>' : '');
+    cells += `<button class="${cls}" data-act="calday" data-d="${ds}" aria-label="${t.getMonth() + 1}月${t.getDate()}日${ev[ds] ? ' 予定' + ev[ds] + '件' : ''}${sy[ds] ? ' 見込み' + sy[ds] + '件' : ''}">${t.getDate()}${dots ? `<i>${dots}</i>` : ''}</button>`;
+  }
+  return `<div class="mc-h"><button data-act="calmon" data-n="-1" aria-label="前の月">‹</button><b>${y}年${m}月</b><button data-act="calmon" data-n="1" aria-label="次の月">›</button></div>
+    <div class="mc-g">${'日月火水木金土'.split('').map((w, i) => `<span class="wk ${i === 0 ? 'su' : i === 6 ? 'sa' : ''}">${w}</span>`).join('')}${cells}</div>
+    <div class="mc-l"><span>予定</span><span class="sys">交換・期限の見込み</span></div>`;
+}
+
 function renderNav() {
+  $('#minical').innerHTML = miniCalHtml();
+  $('#minical').style.display = S.model ? '' : 'none';
   const s = S.model ? sumMap() : {};
   const n = src => rows('要対応').filter(r => r['業務'] === src && r['緊急度'] !== '未実施').length;
   const items = [['dash', 'ダッシュボード', '#', 0, true], ['round', 'ラウンド点検', LINKS.round, S.model ? n('ラウンド') : 0], ['gas', '医療ガス点検', LINKS.gas, S.model ? n('医療ガス') : 0], ['stock', '在庫管理', LINKS.stock, S.model ? n('在庫') : 0]];
@@ -670,9 +783,21 @@ function renderNav() {
     return i[2] ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}>${IC[i[0]]}${label}</a>`
       : `<a aria-disabled="true" style="opacity:.45">${IC[i[0]]}${label}</a>`;
   }).join('');
-  const srcs = [['ラウンド', s['ラウンド_最終取得']], ['医療ガス', s['医療ガス_最終取得']], ['在庫', s['在庫_最終取得']]];
-  $('#srcbox').innerHTML = `${S.auth ? `<div class="side-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></div>` : ''}<span class="h">データの状態</span>${srcs.map(([n, t]) => `<div class="r"><span>${n}</span><span class="${isStale(t) ? 'old' : ''}">${t ? String(t).slice(11, 16) : '—'}</span></div>`).join('')}
+  const st = S.model ? sourceStatus(s) : { latest: '', ng: [], stale: false };
+  $('#srcbox').innerHTML = `${S.auth ? `<div class="side-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></div>` : ''}
+    <span class="h">データの状態</span>
+    ${S.model ? `<div class="r"><span>最終取得</span><span class="${st.stale ? 'src-ng' : 'src-ok'}">${st.latest ? esc(st.latest.slice(5, 16).replace('/', '/')) : '—'}</span></div>
+      ${st.stale ? '<div class="src-ng">⚠ 集約が止まっています</div>' : st.ng.length ? st.ng.map(n => `<div class="src-ng">⚠ ${esc(n.name)}：取得できず（最終 ${esc(n.at ? n.at.slice(11, 16) : '—')}）</div>`).join('') : '<div class="src-ok">✓ 3業務とも取得できています</div>'}` : ''}
     <span class="h" style="margin-top:6px">表示中：${esc(S.sourceLabel || '—')}</span>`;
+}
+/* 3業務の最終取得時刻をまとめる。一番新しい時刻から15分以上遅れている業務は「取得できず」 */
+function sourceStatus(s) {
+  const list = [['ラウンド', s['ラウンド_最終取得']], ['医療ガス', s['医療ガス_最終取得']], ['在庫', s['在庫_最終取得']]].map(([name, at]) => ({ name, at: String(at || '') }));
+  const tm = t => { const m = t.match(/(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/); return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]).getTime() : 0; };
+  const latestT = Math.max(...list.map(x => tm(x.at)), 0);
+  const latest = list.map(x => x.at).find(a => tm(a) === latestT) || '';
+  const ng = list.filter(x => !tm(x.at) || latestT - tm(x.at) > 15 * 60000);
+  return { latest, ng, stale: S.source === 'api' && isStale(latest) };
 }
 
 /* =================== 操作 =================== */
@@ -682,6 +807,19 @@ document.addEventListener('click', e => {
   const a = b.dataset.act;
   if (a === 'refresh') loadApi(true);
   else if (a === 'logout') logout('');
+  else if (a === 'dirpick') chooseDir();
+  else if (a === 'calday') {
+    S.calDay = b.dataset.d === S.calDay ? '' : b.dataset.d; S.sel = 'plan'; S.calMonth = b.dataset.d.slice(0, 7);
+    try { localStorage.setItem('medash_sel', 'plan'); } catch (er) { }
+    render();
+    if (matchMedia('(max-width:960px)').matches) { const el = document.querySelector('.panel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+  else if (a === 'calmon') {
+    const [y, m] = (S.calMonth || refDay().slice(0, 7)).split('-').map(Number);
+    const t = new Date(y, m - 1 + Number(b.dataset.n), 1); S.calMonth = `${t.getFullYear()}-${pad(t.getMonth() + 1)}`; render();
+  }
+  else if (a === 'calreset') { S.calDay = ''; S.calMonth = ''; render(); }
+  else if (a === 'dirload') loadFromDir(true);
   else if (a === 'sel') {
     S.sel = b.dataset.w; S.showAll = false;
     try { localStorage.setItem('medash_sel', S.sel); } catch (er) { }
@@ -696,7 +834,7 @@ document.addEventListener('click', e => {
   }
   else if (a === 'openall') { widgets(sumMap()).forEach(w => OPEN.add(w.id)); saveOpen(); render(); }
   else if (a === 'closeall') { OPEN.clear(); saveOpen(); render(); }
-  else if (a === 'tologin') { S.model = null; S.source = ''; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
+  else if (a === 'tologin') { S.model = null; S.source = ''; S.wantLogin = true; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
   else if (a === 'xlsx') reopenExcel();
   else if (a === 'filter') { S.filter = b.dataset.f; S.showAll = false; render(); }
   else if (a === 'more') { S.showAll = true; render(); }
@@ -720,6 +858,9 @@ else if (!API_URL || S.auth) {
   try { const c = JSON.parse(localStorage.getItem('medash_model') || 'null'); if (c) { S.model = c.m; S.source = c.src; S.sourceLabel = c.label + '（前回）'; } } catch (e) { }
 } else { try { localStorage.removeItem('medash_model'); } catch (e) { } }
 render();
+if (S.folderMode && !S.model) {
+  getDir().then(d => { if (d) { S.dir = d; S.dirName = d.name; render(); loadFromDir(false); } });
+}
 function dayCheck() {
   if (S.auth && S.auth.day !== todayStr()) { logout('日付が変わったため、もう一度ユーザー番号を入力してください'); return false; }
   return true;
