@@ -413,7 +413,7 @@ function render() {
     ${topBar(s)}
     ${S.error ? `<div class="banner err">${esc(S.error)}<button class="btn" data-act="xlsx">${IC.file}Excelから表示</button></div>` : ''}
     ${S.source === 'excel' ? `<div class="banner info">Excelファイルの内容を表示しています（${esc(s['更新日時'] || '')} 時点）。自動更新はされません。</div>` : ''}
-    ${S.source === 'local' ? `<div class="banner info">このパソコンに同期されたデータ（${esc(S.localAt)} 時点）を表示しています。インターネットがなくても見られますが、最新でない場合があります。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
+    ${S.source === 'local' ? `<div class="banner info">${window.DASHBOARD_EMBEDDED ? 'このファイルに保存されたデータ' : 'このパソコンに同期されたデータ'}（${esc(S.localAt)} 時点）を表示しています。インターネットがなくても見られますが、最新ではありません。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
     ${kpis(s)}
     ${miniTiles(map)}
     ${panelHtml(map[S.sel])}`;
@@ -478,7 +478,7 @@ function topBar(s) {
   const stale = s && isStale(s['更新日時']);
   return `<header class="top">
     <div class="ttl"><h1>ダッシュボード</h1><div class="sub">${date}${s ? '　データ ' + esc(s['更新日時'] || '—') + ' 時点' : ''}</div></div>
-    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}このパソコンのデータ</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
+    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
     ${API_URL && S.auth && S.source !== 'local' && S.source !== 'excel' ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
     <button class="btn" data-act="xlsx" title="Excelから表示">${IC.file}<span class="hide-sp">Excel</span></button>
     <button class="btn" data-act="theme" aria-label="表示の切り替え">${IC.moon}</button>
@@ -572,8 +572,14 @@ function todayW() {
     body };
 }
 
+/* 保存されたデータを見るときは「データの日付」を今日として扱う */
+function refDay() {
+  if (S.source === 'api') return todayStr();
+  const m = String(sumMap()['更新日時'] || '').match(/(\d{4})\/(\d{2})\/(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : todayStr();
+}
 function planW() {
-  const today = todayStr();
+  const today = refDay();
   const cal = rows('カレンダー'), sys = rows('予定');
   const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
   const dates = [...new Set(cal.map(r => r['日付']).concat(sys.map(r => r['日付'])))].filter(Boolean).sort();
@@ -671,7 +677,7 @@ function renderNav() {
 
 /* =================== 操作 =================== */
 document.addEventListener('click', e => {
-  const b = e.target.closest('[data-act]');add
+  const b = e.target.closest('[data-act]');
   if (!b || b.disabled) return;
   const a = b.dataset.act;
   if (a === 'refresh') loadApi(true);
@@ -705,9 +711,9 @@ document.addEventListener('change', e => { if (e.target.dataset.act === 'series'
 
 /* 起動：前回の内容を即表示 → 集約データを取得 → 数分ごとに自動更新 */
 S.auth = API_URL ? loadAuth() : null;
-if (location.protocol === 'file:' && window.DASHBOARD_DATA && window.DASHBOARD_DATA.model) {
+if ((location.protocol === 'file:' || window.DASHBOARD_EMBEDDED) && window.DASHBOARD_DATA && window.DASHBOARD_DATA.model) {
   S.model = window.DASHBOARD_DATA.model; S.source = 'local'; S.localAt = window.DASHBOARD_DATA.exportedAt || '';
-  S.sourceLabel = 'このパソコンのデータ';
+  S.sourceLabel = window.DASHBOARD_EMBEDDED ? 'メール・保存ファイルのデータ' : 'このパソコンのデータ';
 }
 if (S.source === 'local') { /* 同期済みデータを表示中 */ }
 else if (!API_URL || S.auth) {
