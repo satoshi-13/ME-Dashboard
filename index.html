@@ -100,6 +100,7 @@ main{flex:1;min-width:0;padding:26px 30px 40px;display:flex;flex-direction:colum
 .tags{display:flex;gap:6px;flex-wrap:wrap}
 .tag{font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}
 .sev-至急{background:var(--red-bg);color:var(--red)}.sev-注意{background:var(--yel-bg);color:var(--yel)}.sev-未実施{background:var(--gry-bg);color:var(--gry);font-weight:600}
+.src-勤務{background:var(--accent-soft);color:var(--accent);font-weight:600}
 .src-ラウンド{background:var(--t-round-bg);color:var(--t-round);font-weight:600}.src-医療ガス{background:var(--t-gas-bg);color:var(--t-gas);font-weight:600}.src-在庫{background:var(--t-stock-bg);color:var(--t-stock);font-weight:600}
 .row2{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch}
 .row2 > .todo-card{flex:2 1 600px}.row2 > .oxy-card{flex:1 1 340px;display:flex;flex-direction:column;gap:14px}
@@ -160,7 +161,17 @@ svg .ln{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}sv
 button.kpi{text-align:left;font:inherit;color:inherit;cursor:pointer}
 button.kpi:hover{border-color:var(--accent)}
 .kpi.on{border:2px solid var(--accent);box-shadow:0 0 0 3px var(--accent-soft);padding:17px 19px}
-.minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.minis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+/* 勤務・業務 */
+.tkrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line2);font-size:14px}
+.tkrow:first-child{border-top:none}
+.tkb{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 6px;border-radius:6px;color:#fff;font-size:12px;font-weight:700}
+.tkrow .who{font-weight:600}.tkrow .who.none{color:var(--muted);font-weight:400}
+.tkrow .n{font-size:13px;color:var(--muted);white-space:nowrap}.tkrow.lack .n,.tkrow.lack .who{color:var(--red);font-weight:700}
+.shl li{grid-template-columns:72px minmax(0,1fr) auto}.shl li .nm{font-weight:700}.shl li .k{font-size:13px}.shl li .k small{color:var(--muted);margin-left:6px}
+.shl li .tks{display:inline-flex;gap:3px}.shl li .tks .tkb{min-width:20px;height:19px;font-size:11px;padding:0 4px}
+.shgrp{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 2px}
+.offline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
 .mini{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
 .mini:hover{border-color:var(--accent)}
 .mini.on{border:2px solid var(--accent);background:var(--accent-soft);padding:7px 13px}
@@ -281,7 +292,8 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
  * API_URL：集約用GASのウェブアプリURL（…/exec）。空欄なら Excel だけで表示します。
  * LINKS  ：各業務アプリのURL（GitHub Pages）。空欄の項目はメニューに出ません。 */
 const API_URL = 'https://script.google.com/macros/s/AKfycbwH4qejeiP6ShZtMjhiV9EGnJSBQxq2xxmyt4oFinl_rbnw8GkjtFZUOjv8VFJE7J8I/exec';
-const LINKS = { round: 'https://satoshi-13.github.io/round-check/', gas: 'https://satoshi-13.github.io/gas-round/', stock: 'https://satoshi-13.github.io/automatic-ordering/' };
+const LINKS = { round: 'https://satoshi-13.github.io/round-check/', gas: 'https://satoshi-13.github.io/gas-round/', stock: 'https://satoshi-13.github.io/automatic-ordering/',
+  shift: '' };   // shift：MEシフト（管理者用）のURL。入れると「勤務・業務」の欄に「MEシフトへ」のリンクが出ます
 const AUTO_REFRESH_MIN = 5;
 
 const $ = s => document.querySelector(s);
@@ -292,7 +304,7 @@ const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(
 const md = s => { const m = String(s).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/); return m ? `${+m[2]}/${+m[3]}` : String(s); };
 const wd = s => { const m = String(s).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/); return m ? '日月火水木金土'[new Date(+m[1], m[2] - 1, +m[3]).getDay()] : ''; };
 const yen = v => num(v) === null ? '—' : '¥' + num(v).toLocaleString('ja-JP');
-const SHEETS = ['概要', '要対応', '今日の状況', '残量', '残量推移', '在庫', '予定', 'カレンダー', '記録', '写真', '日次記録'];
+const SHEETS = ['概要', '要対応', '今日の状況', '残量', '残量推移', '在庫', '予定', 'カレンダー', '記録', '写真', '今日の勤務', '業務担当', '日次記録'];
 const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const IC = {
   dash: SVG('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
@@ -311,7 +323,7 @@ const IC = {
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-width="3"/>')
 };
 
-const S = { model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
+const S = { shiftDay: 0, model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
   folderMode: location.protocol === 'file:', dir: null, dirName: '', fileInfo: '', calMonth: '', calDay: '' };
 S.sel = (() => { try { return localStorage.getItem('medash_sel') || 'plan'; } catch (e) { return 'plan'; } })();
 let OPEN = new Set((() => { try { return JSON.parse(localStorage.getItem('medash_open') || '[]'); } catch (e) { return []; } })());
@@ -503,7 +515,7 @@ function render() {
 
 /* 4つの数字の下に並べる小さなボタン（数字で表しきれない項目） */
 function miniTiles(map) {
-  const MINI = [['plan', '予定'], ['cons', '血ガス消耗品'], ['log', '今日の記録'], ['pic', '写真・完了率']];
+  const MINI = [['shift', '勤務・業務'], ['plan', '予定'], ['cons', '血ガス消耗品'], ['log', '今日の記録'], ['pic', '写真・完了率']];
   return `<nav class="minis" aria-label="そのほかの項目">${MINI.map(([id, label]) => {
     const w = map[id];
     return `<button class="mini ${S.sel === id ? 'on' : ''} ${w.level ? 'lv-b-' + w.level : ''}" data-act="sel" data-w="${id}" aria-pressed="${S.sel === id}">
@@ -536,7 +548,7 @@ function widgetHtml(w) {
 
 /* 新しい情報を足すときは、この一覧に1つ追加するだけ */
 function widgets(s) {
-  return [todoW(s), oxyW(), todayW(), planW(), stockW(s), consW(), logW(), picW()];
+  return [todoW(s), oxyW(), todayW(), planW(), stockW(s), consW(), logW(), picW(), shiftW(s)];
 }
 function loginView() {
   return `<div class="login card">
@@ -561,7 +573,7 @@ function topBar(s) {
   return `<header class="top">
     <div class="ttl"><h1>ダッシュボード</h1><div class="sub">${date}${s ? '　データ ' + esc(s['更新日時'] || '—') + ' 時点' : ''}</div></div>
     ${S.source === 'excel' && S.dir ? `<button class="btn" data-act="dirload">${IC.refresh}<span class="hide-sp">フォルダを読み直す</span></button>` : ''}
-    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : sourceStatus(s).ng.length ? `<span class="pill warn">一部取得できず</span>` : `<span class="pill ok">${IC.check}3業務とも同期済み</span>`) : ''}
+    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : sourceStatus(s).ng.length ? `<span class="pill warn">一部取得できず</span>` : `<span class="pill ok">${IC.check}すべて同期済み</span>`) : ''}
     ${API_URL && S.auth && S.source !== 'local' && S.source !== 'excel' ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
     <button class="btn" data-act="xlsx" title="Excelから表示">${IC.file}<span class="hide-sp">Excel</span></button>
     <button class="btn" data-act="theme" aria-label="表示の切り替え">${IC.moon}</button>
@@ -586,7 +598,7 @@ function kpis(s) {
   </section>`;
 }
 
-function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock }[src] || ''; }
+function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock, '勤務': LINKS.shift }[src] || ''; }
 const dot = lv => `<i class="dot dot-${lv}"></i>`;
 function todoW(s) {
   const all = rows('要対応');
@@ -594,7 +606,7 @@ function todoW(s) {
   if (S.filter !== 'すべて') list = list.filter(r => r['業務'] === S.filter);
   const max = S.showAll ? list.length : 10;
   const top = all.find(r => r['緊急度'] === '至急') || all.find(r => r['緊急度'] === '注意');
-  const body = `<div class="chips" style="margin-bottom:8px">${['すべて', 'ラウンド', '医療ガス', '在庫'].map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div>
+  const body = `<div class="chips" style="margin-bottom:8px">${['すべて', 'ラウンド', '医療ガス', '在庫'].concat(all.some(r => r['業務'] === '勤務') ? ['勤務'] : []).map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div>
     ${list.length ? `<ul class="todo">${list.slice(0, max).map(r => {
       const sev = r['緊急度'], src = r['業務'], href = link(src);
       return `<li><span class="sev"><span class="tag sev-${esc(sev)}">${esc(sev)}</span></span><span class="src"><span class="tag src-${esc(src)}">${esc(src)}</span></span>
@@ -709,6 +721,41 @@ function consW() {
     body, link: LINKS.round ? [LINKS.round, 'ラウンド点検へ'] : null };
 }
 
+/* 勤務・業務（MEシフト）：今日と明日の出勤者と、A業務などの担当 */
+function shiftW(s) {
+  const sh = rows('今日の勤務'), tk = rows('業務担当');
+  const dates = [...new Set(sh.map(r => r['日付']).concat(tk.map(r => r['日付'])))].filter(Boolean).sort();
+  const today = refDay();
+  const idx = Math.min(S.shiftDay, Math.max(dates.length - 1, 0));
+  const day = dates[idx] || today;
+  const tks = tk.filter(r => r['日付'] === day), mem = sh.filter(r => r['日付'] === day);
+  const work = mem.filter(r => r['区分'] === '出勤'), off = mem.filter(r => r['区分'] === '休み');
+  const color = {}; tk.forEach(r => { color[r['業務']] = r['色'] || 'var(--accent)'; });
+  const short = {}; tk.forEach(r => { short[r['業務']] = r['略称'] || String(r['業務']).slice(0, 1); });
+  const badge = n => `<span class="tkb" style="background:${esc(color[n] || 'var(--accent)')}">${esc(short[n] || n.slice(0, 1))}</span>`;
+  const lackToday = tk.filter(r => r['日付'] === today && r['状態'] === '不足');
+  const ce = num(s['出勤_技士']), sp = num(s['出勤_サポーター']);
+  if (!sh.length && !tk.length) {
+    return { id: 'shift', title: '勤務・業務', icon: IC.list, color: 'var(--accent)', mini: '—',
+      summary: '<span class="w-x">MEシフトが未接続です</span>',
+      body: '<p class="empty">MEシフトのデータがありません。集約用GASの「接続先を設定」で、MEシフトのURLを登録してください。</p>' };
+  }
+  const groups = {};
+  work.forEach(r => { (groups[r['職種']] = groups[r['職種']] || []).push(r); });
+  const body = `<div class="chips" style="margin-bottom:10px">${dates.map((d, i) => `<button class="${i === idx ? 'on' : ''}" data-act="shiftday" data-n="${i}">${d === today ? '今日' : '明日'} ${md(d)}（${wd(d)}）</button>`).join('')}</div>
+    ${tks.length ? `<div>${tks.map(r => `<div class="tkrow ${r['状態'] === '不足' ? 'lack' : ''}">${badge(r['業務'])}
+      <span><b>${esc(r['業務'])}</b>　<span class="who ${r['担当'] ? '' : 'none'}">${esc(r['担当'] || (num(r['必要人数']) ? '未定' : '—'))}</span></span>
+      <span class="n">${esc(r['人数'])}/${esc(r['必要人数'])}人</span></div>`).join('')}</div>` : ''}
+    ${Object.keys(groups).map(g => `<div class="shgrp">${esc(g)}　${groups[g].length}人</div><ul class="list shl">${groups[g].map(r => `<li><span class="nm">${esc(r['氏名'])}</span>
+      <span class="k">${esc(r['勤務'])}<small>${esc(r['時間'])}</small>${r['メモ'] ? `<small>${esc(r['メモ'])}</small>` : ''}</span>
+      <span class="tks">${String(r['業務'] || '').split('・').filter(Boolean).map(badge).join('')}</span></li>`).join('')}</ul>`).join('')}
+    ${off.length ? `<div class="offline">休み：${off.map(r => esc(r['氏名'] + '（' + r['勤務'] + '）')).join('、')}</div>` : ''}`;
+  return { id: 'shift', title: '勤務・業務', icon: IC.list, color: 'var(--accent)', level: lackToday.length ? 'warn' : '',
+    mini: lackToday.length ? `<b class="lv-warn">未定 ${lackToday.length}</b>` : `技士 <b>${ce ?? '—'}</b>`,
+    summary: `<span class="w-k">技士 <b>${ce ?? '—'}</b>人</span><span class="w-k">サポーター <b>${sp ?? '—'}</b>人</span>${lackToday.length ? `<span class="w-k lv-warn">担当未定 <b>${lackToday.length}</b></span>` : ''}`,
+    body, link: LINKS.shift ? [LINKS.shift, 'MEシフトへ'] : null };
+}
+
 function logW() {
   const l = rows('記録');
   const color = { 'ラウンド': 'var(--t-round)', '医療ガス': 'var(--t-gas)', '在庫': 'var(--t-stock)' };
@@ -787,12 +834,13 @@ function renderNav() {
   $('#srcbox').innerHTML = `${S.auth ? `<div class="side-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></div>` : ''}
     <span class="h">データの状態</span>
     ${S.model ? `<div class="r"><span>最終取得</span><span class="${st.stale ? 'src-ng' : 'src-ok'}">${st.latest ? esc(st.latest.slice(5, 16).replace('/', '/')) : '—'}</span></div>
-      ${st.stale ? '<div class="src-ng">⚠ 集約が止まっています</div>' : st.ng.length ? st.ng.map(n => `<div class="src-ng">⚠ ${esc(n.name)}：取得できず（最終 ${esc(n.at ? n.at.slice(11, 16) : '—')}）</div>`).join('') : '<div class="src-ok">✓ 3業務とも取得できています</div>'}` : ''}
+      ${st.stale ? '<div class="src-ng">⚠ 集約が止まっています</div>' : st.ng.length ? st.ng.map(n => `<div class="src-ng">⚠ ${esc(n.name)}：取得できず（最終 ${esc(n.at ? n.at.slice(11, 16) : '—')}）</div>`).join('') : '<div class="src-ok">✓ すべて取得できています</div>'}` : ''}
     <span class="h" style="margin-top:6px">表示中：${esc(S.sourceLabel || '—')}</span>`;
 }
 /* 3業務の最終取得時刻をまとめる。一番新しい時刻から15分以上遅れている業務は「取得できず」 */
 function sourceStatus(s) {
-  const list = [['ラウンド', s['ラウンド_最終取得']], ['医療ガス', s['医療ガス_最終取得']], ['在庫', s['在庫_最終取得']]].map(([name, at]) => ({ name, at: String(at || '') }));
+  const list = [['ラウンド', s['ラウンド_最終取得']], ['医療ガス', s['医療ガス_最終取得']], ['在庫', s['在庫_最終取得']]]
+    .concat(s['勤務_最終取得'] ? [['勤務', s['勤務_最終取得']]] : []).map(([name, at]) => ({ name, at: String(at || '') }));
   const tm = t => { const m = t.match(/(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/); return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]).getTime() : 0; };
   const latestT = Math.max(...list.map(x => tm(x.at)), 0);
   const latest = list.map(x => x.at).find(a => tm(a) === latestT) || '';
@@ -836,6 +884,7 @@ document.addEventListener('click', e => {
   else if (a === 'closeall') { OPEN.clear(); saveOpen(); render(); }
   else if (a === 'tologin') { S.model = null; S.source = ''; S.wantLogin = true; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
   else if (a === 'xlsx') reopenExcel();
+  else if (a === 'shiftday') { S.shiftDay = Number(b.dataset.n) || 0; render(); }
   else if (a === 'filter') { S.filter = b.dataset.f; S.showAll = false; render(); }
   else if (a === 'more') { S.showAll = true; render(); }
   else if (a === 'theme') {
