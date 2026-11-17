@@ -113,6 +113,7 @@ main{flex:1;min-width:0;padding:26px 30px 40px;display:flex;flex-direction:colum
 .todo li{display:grid;grid-template-columns:72px 96px minmax(0,1fr) 150px 52px;gap:10px;align-items:center;padding:11px 4px;border-top:1px solid var(--line2);font-size:14px}
 .todo li .c b{font-weight:700}.todo li .c span{color:var(--muted)}
 .todo li .due{font-weight:600}.todo li .due.至急{color:var(--red)}.todo li .due.注意{color:var(--yel)}.todo li .due.未実施{color:var(--gry);font-weight:400}
+.todo li button.lnk{border:none;background:none;padding:0;font:inherit;font-weight:600;color:var(--accent);cursor:pointer;min-height:44px}
 .todo li a{font-weight:600;text-decoration:none;display:inline-flex;min-height:44px;align-items:center}
 .todo .more{text-align:center;padding:10px 0 0}
 .empty{color:var(--muted);font-size:14px;padding:14px 4px}
@@ -172,6 +173,18 @@ button.kpi:hover{border-color:var(--accent)}
 .shl li .tks{display:inline-flex;gap:3px}.shl li .tks .tkb{min-width:20px;height:19px;font-size:11px;padding:0 4px}
 .shgrp{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 2px}
 .offline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+.tkwarn{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--yel-bg);color:var(--yel);border-radius:10px;padding:10px 12px;font-weight:700;font-size:14px;margin-bottom:8px}
+.tkrow .btn.sm,.tkadd{white-space:nowrap}
+.tkadd{margin-top:8px;display:inline-flex;width:auto;align-self:flex-start}
+.tked{border:2px solid var(--accent);border-radius:12px;padding:12px;margin:8px 0 4px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.tked .h{font-size:13px;font-weight:700;color:var(--muted)}
+.tked .opts{display:flex;flex-wrap:wrap;gap:6px}
+.tked .opts button{min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.tked .opts button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.tked .opts button small{display:block;font-size:11px;opacity:.75;line-height:1.1}
+.tked .acts{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.tked .msg{color:var(--red);font-size:13px;margin-right:auto}
+.btn.pri-s{background:var(--accent);border-color:var(--accent);color:#fff}
 .mini{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
 .mini:hover{border-color:var(--accent)}
 .mini.on{border:2px solid var(--accent);background:var(--accent-soft);padding:7px 13px}
@@ -293,7 +306,10 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
  * LINKS  ：各業務アプリのURL（GitHub Pages）。空欄の項目はメニューに出ません。 */
 const API_URL = 'https://script.google.com/macros/s/AKfycbwH4qejeiP6ShZtMjhiV9EGnJSBQxq2xxmyt4oFinl_rbnw8GkjtFZUOjv8VFJE7J8I/exec';
 const LINKS = { round: 'https://satoshi-13.github.io/round-check/', gas: 'https://satoshi-13.github.io/gas-round/', stock: 'https://satoshi-13.github.io/automatic-ordering/',
-  shift: '' };   // shift：MEシフト（管理者用）のURL。入れると「勤務・業務」の欄に「MEシフトへ」のリンクが出ます
+  // shift：MEシフトの「アクセス：全員」で公開したURL（…/exec）。管理者には左のメニューに「シフト管理」が出ます
+  shift: '',
+  // stockCart：在庫管理の発注カートを直接開くURL。空欄なら在庫管理のトップを開きます（管理者だけに表示）
+  stockCart: '' };
 const AUTO_REFRESH_MIN = 5;
 
 const $ = s => document.querySelector(s);
@@ -318,12 +334,14 @@ const IC = {
   check: SVG('<path d="M5 12l4 4 10-10"/>'),
   chev: SVG('<path d="M6 9l6 6 6-6"/>'),
   alert: SVG('<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/>'),
+  shift: SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h3M8 17h6"/>'),
+  cart: SVG('<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/>'),
   cal: SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
   drop: SVG('<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'),
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-width="3"/>')
 };
 
-const S = { shiftDay: 0, model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
+const S = { shiftDay: 0, tkEdit: null, model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
   folderMode: location.protocol === 'file:', dir: null, dirName: '', fileInfo: '', calMonth: '', calDay: '' };
 S.sel = (() => { try { return localStorage.getItem('medash_sel') || 'plan'; } catch (e) { return 'plan'; } })();
 let OPEN = new Set((() => { try { return JSON.parse(localStorage.getItem('medash_open') || '[]'); } catch (e) { return []; } })());
@@ -598,7 +616,7 @@ function kpis(s) {
   </section>`;
 }
 
-function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock, '勤務': LINKS.shift }[src] || ''; }
+function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock }[src] || ''; }
 const dot = lv => `<i class="dot dot-${lv}"></i>`;
 function todoW(s) {
   const all = rows('要対応');
@@ -611,7 +629,7 @@ function todoW(s) {
       const sev = r['緊急度'], src = r['業務'], href = link(src);
       return `<li><span class="sev"><span class="tag sev-${esc(sev)}">${esc(sev)}</span></span><span class="src"><span class="tag src-${esc(src)}">${esc(src)}</span></span>
         <span class="c"><b>${esc(r['内容'])}</b>${r['詳細'] ? `<span>　${esc(r['詳細'])}</span>` : ''}</span>
-        <span class="due ${esc(sev)}">${esc(r['期限'])}</span><span class="a">${href ? `<a href="${esc(href)}">開く</a>` : ''}</span></li>`;
+        <span class="due ${esc(sev)}">${esc(r['期限'])}</span><span class="a">${src === '勤務' ? `<button class="lnk" data-act="sel" data-w="shift">開く</button>` : href ? `<a href="${esc(href)}">開く</a>` : ''}</span></li>`;
     }).join('')}</ul>` : '<p class="empty">対応が必要なものはありません</p>'}
     ${list.length > max ? `<div class="more"><button class="btn" data-act="more">残り ${list.length - max} 件を表示</button></div>` : ''}`;
   const n = k => num(s[k]) || 0;
@@ -704,7 +722,8 @@ function stockW(s) {
     <span class="muted" style="font-size:12px;display:block;margin-top:8px">在庫の評価額 ${yen(s['在庫_評価額'])}</span>`;
   return { id: 'stock', title: '在庫', icon: IC.stock, color: 'var(--t-stock)', level: out ? 'alert' : need.length ? 'warn' : '',
     summary: `<span class="w-k">要発注 <b>${esc(s['在庫_要発注'] || 0)}</b></span>${out ? `<span class="w-k lv-alert">在庫切れ <b>${out}</b></span>` : ''}<span class="w-k">発注中 <b>${esc(s['在庫_発注中'] || 0)}</b></span><span class="w-k">今月 <b>${yen(s['在庫_今月発注額'])}</b></span>`,
-    body, link: LINKS.stock ? [LINKS.stock, '在庫管理（発注カート）へ'] : null };
+    body: body + (isAdminUser() && (LINKS.stockCart || LINKS.stock) ? `<a class="big" href="${esc(LINKS.stockCart || LINKS.stock)}">${IC.cart}<span style="margin-left:8px">発注カートを開く${need.length ? `（要発注 ${need.length}品目）` : ''}</span></a>` : ''),
+    link: LINKS.stock ? [LINKS.stock, '在庫管理へ'] : null };
 }
 
 function consW() {
@@ -721,7 +740,9 @@ function consW() {
     body, link: LINKS.round ? [LINKS.round, 'ラウンド点検へ'] : null };
 }
 
-/* 勤務・業務（MEシフト）：今日と明日の出勤者と、A業務などの担当 */
+/* 勤務・業務（MEシフト）：今日と明日の出勤者と、A業務などの担当。担当割りはその場で変えられる（ログイン中のみ） */
+const canEdit = () => S.source === 'api' && !!S.auth;
+const isAdminUser = () => !!(S.auth && S.auth.role === '管理者');
 function shiftW(s) {
   const sh = rows('今日の勤務'), tk = rows('業務担当');
   const dates = [...new Set(sh.map(r => r['日付']).concat(tk.map(r => r['日付'])))].filter(Boolean).sort();
@@ -730,30 +751,84 @@ function shiftW(s) {
   const day = dates[idx] || today;
   const tks = tk.filter(r => r['日付'] === day), mem = sh.filter(r => r['日付'] === day);
   const work = mem.filter(r => r['区分'] === '出勤'), off = mem.filter(r => r['区分'] === '休み');
-  const color = {}; tk.forEach(r => { color[r['業務']] = r['色'] || 'var(--accent)'; });
-  const short = {}; tk.forEach(r => { short[r['業務']] = r['略称'] || String(r['業務']).slice(0, 1); });
-  const badge = n => `<span class="tkb" style="background:${esc(color[n] || 'var(--accent)')}">${esc(short[n] || n.slice(0, 1))}</span>`;
-  const lackToday = tk.filter(r => r['日付'] === today && r['状態'] === '不足');
+  const color = {}, short = {};
+  tk.forEach(r => { color[r['業務']] = r['色'] || 'var(--accent)'; short[r['業務']] = r['略称'] || String(r['業務']).slice(0, 1); });
+  const badge = n => `<span class="tkb" style="background:${esc(color[n] || 'var(--accent)')}">${esc(short[n] || String(n).slice(0, 1))}</span>`;
+  const names = r => String(r['担当'] || '').split('・').filter(Boolean);
+  const assigned = tks.filter(r => names(r).length);
+  const ceWork = work.filter(r => tks.some(t => !t['対象職種'] || t['対象職種'] === r['職種'])).length;
+  const noneOn = d => { const a = tk.filter(r => r['日付'] === d); return a.length && !a.some(r => names(r).length); };
+  const noneToday = noneOn(today) && (num(s['出勤_技士']) || 0) > 0;
   const ce = num(s['出勤_技士']), sp = num(s['出勤_サポーター']);
   if (!sh.length && !tk.length) {
-    return { id: 'shift', title: '勤務・業務', icon: IC.list, color: 'var(--accent)', mini: '—',
+    return { id: 'shift', title: '勤務・業務', icon: IC.shift, color: 'var(--accent)', mini: '—',
       summary: '<span class="w-x">MEシフトが未接続です</span>',
       body: '<p class="empty">MEシフトのデータがありません。集約用GASの「接続先を設定」で、MEシフトのURLを登録してください。</p>' };
   }
-  const groups = {};
-  work.forEach(r => { (groups[r['職種']] = groups[r['職種']] || []).push(r); });
+  // 担当割りの編集欄
+  const ed = S.tkEdit && S.tkEdit.date === day ? S.tkEdit : null;
+  const editor = () => {
+    const cur = tks.find(r => r['業務'] === ed.task);
+    const role = cur ? cur['対象職種'] : '';
+    const cands = work.filter(r => !role || r['職種'] === role);
+    return `<div class="tked" role="group" aria-label="担当割り">
+      <div class="h">業務</div>
+      <div class="opts">${tks.map(r => `<button class="${r['業務'] === ed.task ? 'on' : ''}" data-act="tktask" data-task="${esc(r['業務'])}">${badge(r['業務'])} ${esc(r['業務'])}</button>`).join('')}</div>
+      <div class="h">担当する人（${md(day)} 出勤${role ? '・' + esc(role) : ''}）　複数選べます</div>
+      <div class="opts">${cands.length ? cands.map(r => `<button class="${ed.sel.includes(r['氏名']) ? 'on' : ''}" data-act="tkpick" data-name="${esc(r['氏名'])}" aria-pressed="${ed.sel.includes(r['氏名'])}">${esc(r['氏名'])}<small>${esc(r['時間'])}</small></button>`).join('') : '<span class="muted">この日に出勤している人がいません</span>'}</div>
+      <div class="acts"><span class="msg">${esc(ed.msg || '')}</span>
+        <button class="btn" data-act="tkcancel" ${S.busy ? 'disabled' : ''}>やめる</button>
+        <button class="btn pri-s" data-act="tksave" ${S.busy ? 'disabled' : ''}>${S.busy ? '保存中…' : '保存'}</button></div>
+    </div>`;
+  };
+  const first = (tks.find(r => !names(r).length) || tks[0] || {})['業務'];
   const body = `<div class="chips" style="margin-bottom:10px">${dates.map((d, i) => `<button class="${i === idx ? 'on' : ''}" data-act="shiftday" data-n="${i}">${d === today ? '今日' : '明日'} ${md(d)}（${wd(d)}）</button>`).join('')}</div>
-    ${tks.length ? `<div>${tks.map(r => `<div class="tkrow ${r['状態'] === '不足' ? 'lack' : ''}">${badge(r['業務'])}
-      <span><b>${esc(r['業務'])}</b>　<span class="who ${r['担当'] ? '' : 'none'}">${esc(r['担当'] || (num(r['必要人数']) ? '未定' : '—'))}</span></span>
-      <span class="n">${esc(r['人数'])}/${esc(r['必要人数'])}人</span></div>`).join('')}</div>` : ''}
-    ${Object.keys(groups).map(g => `<div class="shgrp">${esc(g)}　${groups[g].length}人</div><ul class="list shl">${groups[g].map(r => `<li><span class="nm">${esc(r['氏名'])}</span>
-      <span class="k">${esc(r['勤務'])}<small>${esc(r['時間'])}</small>${r['メモ'] ? `<small>${esc(r['メモ'])}</small>` : ''}</span>
-      <span class="tks">${String(r['業務'] || '').split('・').filter(Boolean).map(badge).join('')}</span></li>`).join('')}</ul>`).join('')}
-    ${off.length ? `<div class="offline">休み：${off.map(r => esc(r['氏名'] + '（' + r['勤務'] + '）')).join('、')}</div>` : ''}`;
-  return { id: 'shift', title: '勤務・業務', icon: IC.list, color: 'var(--accent)', level: lackToday.length ? 'warn' : '',
-    mini: lackToday.length ? `<b class="lv-warn">未定 ${lackToday.length}</b>` : `技士 <b>${ce ?? '—'}</b>`,
-    summary: `<span class="w-k">技士 <b>${ce ?? '—'}</b>人</span><span class="w-k">サポーター <b>${sp ?? '—'}</b>人</span>${lackToday.length ? `<span class="w-k lv-warn">担当未定 <b>${lackToday.length}</b></span>` : ''}`,
-    body, link: LINKS.shift ? [LINKS.shift, 'MEシフトへ'] : null };
+    ${tks.length && !assigned.length && ceWork ? `<div class="tkwarn"><span>⚠ ${d0(day, today)}の業務の担当割りがまだありません</span>${canEdit() && !ed ? `<button class="btn sm" data-act="tkedit" data-task="${esc(first)}" data-date="${esc(day)}">担当を割り当てる</button>` : ''}</div>` : ''}
+    ${assigned.length ? `<div>${assigned.map(r => `<div class="tkrow">${badge(r['業務'])}
+      <span><b>${esc(r['業務'])}</b>　<span class="who">${esc(r['担当'])}</span></span>
+      ${canEdit() && !ed ? `<button class="btn sm" data-act="tkedit" data-task="${esc(r['業務'])}" data-date="${esc(day)}">変更</button>` : `<span class="n">${esc(r['人数'])}人</span>`}</div>`).join('')}</div>` : ''}
+    ${ed ? editor() : assigned.length && canEdit() && tks.some(r => !names(r).length) ? `<div><button class="btn sm tkadd" data-act="tkedit" data-task="${esc(first)}" data-date="${esc(day)}">＋ ほかの業務の担当を割り当てる</button></div>` : ''}
+    ${(() => {
+      const groups = {};
+      work.forEach(r => { (groups[r['職種']] = groups[r['職種']] || []).push(r); });
+      return Object.keys(groups).map(g => `<div class="shgrp">${esc(g)}　${groups[g].length}人</div><ul class="list shl">${groups[g].map(r => `<li><span class="nm">${esc(r['氏名'])}</span>
+        <span class="k">${esc(r['勤務'])}<small>${esc(r['時間'])}</small>${r['メモ'] ? `<small>${esc(r['メモ'])}</small>` : ''}</span>
+        <span class="tks">${String(r['業務'] || '').split('・').filter(Boolean).map(badge).join('')}</span></li>`).join('')}</ul>`).join('');
+    })()}
+    ${off.length ? `<div class="offline">休み：${off.map(r => esc(r['氏名'] + '（' + r['勤務'] + '）')).join('、')}</div>` : ''}
+    ${!canEdit() && tks.length ? '<p class="muted" style="font-size:12px;margin-top:10px">担当割りの変更は、ログインして最新のデータを表示しているときにできます。</p>' : ''}`;
+  return { id: 'shift', title: '勤務・業務', icon: IC.shift, color: 'var(--accent)', level: noneToday ? 'warn' : '',
+    mini: noneToday ? '<b class="lv-warn">未割当</b>' : `技士 <b>${ce ?? '—'}</b>`,
+    summary: `<span class="w-k">技士 <b>${ce ?? '—'}</b>人</span><span class="w-k">サポーター <b>${sp ?? '—'}</b>人</span>${noneToday ? '<span class="w-k lv-warn">担当割りがまだありません</span>' : ''}`,
+    body, link: isAdminUser() && LINKS.shift ? [shiftAppUrl(), 'シフト管理へ'] : null };
+}
+const d0 = (d, today) => d === today ? '今日' : md(d) + '（' + wd(d) + '）';
+function shiftAppUrl() {
+  if (!LINKS.shift) return '';
+  return LINKS.shift + (LINKS.shift.includes('?') ? '&' : '?') + 't=' + encodeURIComponent(S.auth ? S.auth.token : '');
+}
+
+/* 担当割りの保存：集約用GAS → MEシフトのスプレッドシート */
+async function saveTask() {
+  const ed = S.tkEdit;
+  if (!ed || !S.auth) return;
+  const cur = rows('業務担当').find(r => r['日付'] === ed.date && r['業務'] === ed.task);
+  const base = cur ? String(cur['担当'] || '').split('・').filter(Boolean) : [];
+  S.busy = true; ed.msg = ''; render();
+  try {
+    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'assignTask', token: S.auth.token, date: ed.date, task: ed.task, names: ed.sel, base }) });
+    const j = await r.json();
+    if (j.auth) { S.busy = false; S.tkEdit = null; logout('ログインの有効期限が切れました。もう一度ユーザー番号を入力してください'); return; }
+    if (!j.ok) throw new Error(j.error || '保存できませんでした');
+    setModel(j.data, 'api', '集約データ');
+    S.tkEdit = null;
+  } catch (e) {
+    ed.msg = e.message === 'Failed to fetch' ? '通信できませんでした。電波を確認してください' : e.message;
+    if (/先に変更/.test(ed.msg)) { S.busy = false; await loadApi(false); const c = rows('業務担当').find(r => r['日付'] === ed.date && r['業務'] === ed.task); ed.sel = c ? String(c['担当'] || '').split('・').filter(Boolean) : []; }
+  }
+  S.busy = false;
+  render();
 }
 
 function logW() {
@@ -822,12 +897,14 @@ function renderNav() {
   const s = S.model ? sumMap() : {};
   const n = src => rows('要対応').filter(r => r['業務'] === src && r['緊急度'] !== '未実施').length;
   const items = [['dash', 'ダッシュボード', '#', 0, true], ['round', 'ラウンド点検', LINKS.round, S.model ? n('ラウンド') : 0], ['gas', '医療ガス点検', LINKS.gas, S.model ? n('医療ガス') : 0], ['stock', '在庫管理', LINKS.stock, S.model ? n('在庫') : 0]];
+  // 管理者だけ：シフト管理（ダッシュボードの通行証を付けて開く。MEシフト側で管理者か確認する）
+  if (isAdminUser() && LINKS.shift) items.push(['shift', 'シフト管理', shiftAppUrl(), 0, false, true]);
   $('#nav').innerHTML = items.map(i => i[2]
-    ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}>${IC[i[0]]}<span>${i[1]}</span>${i[3] ? `<span class="cnt">${i[3]}</span>` : ''}</a>`
+    ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}<span>${i[1]}</span>${i[3] ? `<span class="cnt">${i[3]}</span>` : ''}</a>`
     : `<a class="off" aria-disabled="true" title="URL未設定">${IC[i[0]]}<span>${i[1]}</span><small>未設定</small></a>`).join('');
   $('#tabbar').innerHTML = items.map(i => {
     const label = i[0] === 'dash' ? 'ダッシュボード' : i[1].replace('点検', '').replace('管理', '');
-    return i[2] ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}>${IC[i[0]]}${label}</a>`
+    return i[2] ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}${label}</a>`
       : `<a aria-disabled="true" style="opacity:.45">${IC[i[0]]}${label}</a>`;
   }).join('');
   const st = S.model ? sourceStatus(s) : { latest: '', ng: [], stale: false };
@@ -884,7 +961,16 @@ document.addEventListener('click', e => {
   else if (a === 'closeall') { OPEN.clear(); saveOpen(); render(); }
   else if (a === 'tologin') { S.model = null; S.source = ''; S.wantLogin = true; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
   else if (a === 'xlsx') reopenExcel();
-  else if (a === 'shiftday') { S.shiftDay = Number(b.dataset.n) || 0; render(); }
+  else if (a === 'shiftday') { S.shiftDay = Number(b.dataset.n) || 0; S.tkEdit = null; render(); }
+  else if (a === 'tkedit' || a === 'tktask') {
+    const date = a === 'tkedit' ? b.dataset.date : S.tkEdit.date;
+    const cur = rows('業務担当').find(r => r['日付'] === date && r['業務'] === b.dataset.task);
+    S.tkEdit = { date, task: b.dataset.task, sel: cur ? String(cur['担当'] || '').split('・').filter(Boolean) : [], msg: '' };
+    render();
+  }
+  else if (a === 'tkpick') { const ed = S.tkEdit, n = b.dataset.name; ed.sel = ed.sel.includes(n) ? ed.sel.filter(x => x !== n) : ed.sel.concat([n]); render(); }
+  else if (a === 'tkcancel') { S.tkEdit = null; render(); }
+  else if (a === 'tksave') saveTask();
   else if (a === 'filter') { S.filter = b.dataset.f; S.showAll = false; render(); }
   else if (a === 'more') { S.showAll = true; render(); }
   else if (a === 'theme') {
