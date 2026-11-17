@@ -267,7 +267,119 @@ button.kpi:hover{border-color:var(--accent)}
   .tabbar svg{width:24px;height:24px}
   .hide-sp{display:none}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== シンプル版（2026-11） ===== */
+:root{--r:14px;--sh:0 1px 2px rgba(15,27,45,.04),0 4px 16px rgba(15,27,45,.04)}
+main{max-width:1280px}
+.side{flex-basis:224px;gap:22px}
+.srcbox{margin-top:auto;background:none;padding:0 6px}
+.side-user{border:0;padding:0;margin:0}
+.side-user button{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--nav-muted)}
+.side-user button:hover{background:var(--nav-hi);color:#fff}
+.side-user button svg{width:18px;height:18px}
+.card{border-radius:var(--r);box-shadow:var(--sh)}
+/* ヘッダー */
+.top{gap:10px;flex-wrap:nowrap}
+.top .ttl{flex:1;min-width:0;display:flex;align-items:baseline;gap:12px}
+.top h1{font-size:24px;letter-spacing:.01em}
+.top .sub{font-size:14px}
+.sync{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--muted);white-space:nowrap}
+.sync svg{width:15px;height:15px}
+button.sync:hover{border-color:var(--accent);color:var(--ink)}
+.sync-warn{color:var(--yel);border-color:var(--yel-bar)}
+.ib{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none;padding:0}
+.ib svg{width:19px;height:19px}.ib:hover{border-color:var(--accent)}
+.menu-w{position:relative}
+.menu{position:absolute;right:0;top:46px;z-index:40;min-width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(15,27,45,.16);padding:6px;display:flex;flex-direction:column}
+.menu button{display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:0;border-radius:8px;background:none;text-align:left;font-size:14px}
+.menu button:hover{background:var(--bg)}.menu svg{width:18px;height:18px;color:var(--muted)}
+/* 状態の点 */
+.sd{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dash);flex:none}
+.sd-ok{background:var(--grn-bar)}.sd-warn{background:var(--yel-bar)}.sd-alert{background:var(--red-dot)}.sd-idle{background:transparent;box-shadow:inset 0 0 0 2px var(--dash)}
+/* 数字のタイル */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;padding:16px 18px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);box-shadow:var(--sh);min-width:0;transition:border-color .12s,transform .12s}
+.tile:hover{border-color:var(--accent)}.tile:active{transform:scale(.99)}
+.tl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.tl .tc{margin-left:auto;color:var(--dash);display:flex}.tl .tc svg{width:16px;height:16px}
+.tile:hover .tc{color:var(--accent)}
+.tv{display:flex;align-items:baseline;gap:5px}.tv b{font-size:34px;line-height:1.05;font-weight:700;letter-spacing:-.01em}.tv small{font-size:13px;color:var(--muted)}
+.ts{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .bar{height:5px}
+/* 2列 */
+.cols{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:14px;align-items:start}
+.cols .card{padding:18px 20px}
+.cols .hd{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.cols .hd h2{font-size:16px}
+.hd .cnt{display:flex;gap:10px;font-size:12.5px;font-weight:700}
+.c-alert{color:var(--red)}.c-warn{color:var(--yel)}
+.lk{margin-left:auto;border:0;background:none;padding:6px 0;color:var(--accent);font-size:13px;font-weight:600}
+.hd2{margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}
+/* 要対応の行 */
+.tl-list{list-style:none;margin:0;padding:0}
+.ti{display:grid;grid-template-columns:8px minmax(0,1fr) auto 32px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line2)}
+.ti:first-child{border-top:0}
+.ti .tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ti .tx b{font-size:14.5px;font-weight:600;line-height:1.45}
+.ti .tx small{font-size:12.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+.ti .src{font-weight:700;background:none;padding:0}.ti .src-ラウンド{color:var(--t-round)}.ti .src-医療ガス{color:var(--t-gas)}.ti .src-在庫{color:var(--t-stock)}.ti .src-勤務{color:var(--accent)}
+.due{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}.due-alert{color:var(--red)}.due-warn{color:var(--yel)}
+.go{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--muted);border:0;background:none;padding:0}
+.go:hover{background:var(--bg);color:var(--accent)}.go svg{width:18px;height:18px}
+.allok{display:flex;align-items:center;gap:8px;color:var(--grn);font-weight:600;font-size:14px;margin:10px 0}.allok svg{width:18px;height:18px}
+.more-l{border:0;background:none;color:var(--accent);font-size:13px;font-weight:600;padding:8px 0 0}
+.idle{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:10px 12px;border-radius:10px;border:0;background:var(--bg);text-align:left;font-size:13.5px;font-weight:600}
+.idle small{color:var(--muted);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* 今日の予定・担当 */
+.evs{list-style:none;margin:0;padding:0}
+.evs li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;padding:7px 0;font-size:14px}
+.evs li .tm{color:var(--muted);font-size:13px;font-weight:600}
+.evs li small{display:block;font-size:12px;color:var(--muted)}
+.evs li.past{opacity:.45}
+.nil{color:var(--muted);font-size:13.5px;margin:6px 0}
+.tkc{display:flex;flex-wrap:wrap;gap:8px}
+.tkc span{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 4px;border-radius:99px;background:var(--bg);font-size:13.5px;font-weight:600}
+.tkc span.un{color:var(--muted);font-weight:400}
+.tkc i{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font-style:normal;font-size:12px;font-weight:700}
+.tkwarn2{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:var(--yel-bg);color:var(--yel);font-size:13.5px;font-weight:700;text-align:left}
+.tkwarn2 svg{width:18px;height:18px;flex:none}.tkwarn2 b{margin-left:auto;text-decoration:underline}
+.staff{font-size:13px;color:var(--muted);margin:10px 0 0}.staff b{color:var(--ink)}
+/* ドロワー */
+#drawer .dr-bg{position:fixed;inset:0;background:rgba(10,17,28,.38);z-index:50;animation:fd .15s}
+#drawer .dr{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);z-index:51;background:var(--surface);display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(10,17,28,.18);animation:sl .18s ease-out}
+.dr-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line2)}
+.dr-h h2{margin:0;font-size:17px;flex:1;min-width:0}
+.dr-l{font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
+.dr-b{flex:1;overflow-y:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.dr-b .sec{font-size:13px;color:var(--muted);margin:14px 0 0;padding-top:14px;border-top:1px solid var(--line2)}
+.dr-b .minical-sp{display:block;background:var(--nav);color:var(--nav-ink);border-radius:12px;padding:10px;--nav-muted:#a9b6ca;--nav-hi:#23324a;--nav-ink:#e8edf5}
+.dr-b .chips{margin-bottom:2px}
+.big svg{width:18px;height:18px;flex:none}
+.big{gap:8px}
+.kv{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;font-size:13px;color:var(--muted)}.kv b{color:var(--ink);font-size:14px}
+body.dr-open{overflow:hidden}
+@keyframes sl{from{transform:translateX(24px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes fd{from{opacity:0}to{opacity:1}}
+.tabbar a{position:relative}.tbn{position:absolute;top:2px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--red-dot);color:#fff;font-style:normal;font-size:10px;line-height:16px;text-align:center}
+@media (min-width:961px){main{height:auto;overflow:visible;padding:28px 34px 40px;gap:16px}}
+@media (max-width:1180px) and (min-width:961px){.cols{grid-template-columns:1fr}}
+@media (max-width:960px){
+  main{padding:14px 14px 96px;gap:12px}
+  .top h1{font-size:20px}.top .sub{display:none}
+  .sync{height:38px;padding:0 12px;font-size:12.5px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{padding:12px 14px;gap:4px}.tv b{font-size:28px}
+  .cols{grid-template-columns:1fr;gap:12px}
+  .cols .card{padding:14px 16px}
+  .ti{grid-template-columns:8px minmax(0,1fr) auto 28px;gap:10px}
+  #drawer .dr{top:0;width:100%;animation:up .2s ease-out}
+  .dr-h{padding:12px 14px;padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+  .dr-b{padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 28px)}
+  .tabbar{gap:0}
+}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+@media print{#drawer{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{.side,.tabbar,.top .btn{display:none}main{padding:0}}
 </style>
 </head>
@@ -276,15 +388,15 @@ button.kpi:hover{border-color:var(--accent)}
   <nav class="side" aria-label="メインメニュー">
     <div class="brand">
       <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
-      <div><b>ME業務アプリ</b><span>臨床工学部 保守管理センター</span></div>
+      <div><b>ME業務アプリ</b><span>臨床工学部</span></div>
     </div>
     <div class="nav" id="nav"></div>
-    <div class="minical" id="minical"></div>
     <div class="srcbox" id="srcbox"></div>
   </nav>
   <main id="main"><p class="loading">読み込んでいます…</p></main>
 </div>
 <nav class="tabbar" id="tabbar" aria-label="業務の切り替え"></nav>
+<div id="drawer"></div>
 <input type="file" id="xlsxInput" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
 <div class="drop" id="drop"><div>Excelファイルをここに離してください</div></div>
 
@@ -307,8 +419,9 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
  * LINKS  ：各業務アプリのURL（GitHub Pages）。空欄の項目はメニューに出ません。 */
 const API_URL = 'https://script.google.com/macros/s/AKfycbwH4qejeiP6ShZtMjhiV9EGnJSBQxq2xxmyt4oFinl_rbnw8GkjtFZUOjv8VFJE7J8I/exec';
 const LINKS = { round: 'https://satoshi-13.github.io/round-check/', gas: 'https://satoshi-13.github.io/gas-round/', stock: 'https://satoshi-13.github.io/automatic-ordering/',
-  // shift：MEシフトの「アクセス：全員」で公開したURL（…/exec）。管理者には左のメニューに「シフト管理」が出ます
-  shift: '',
+  // shift：MEシフトの画面（GitHub Pages）のURL。管理者には左のメニューに「シフト管理」が出ます
+  //        空欄なら、集約用GASから届くMEシフト（GAS）のURLを使います
+  shift: 'https://satoshi-13.github.io/me-shift/',
   // stockCart：在庫管理の発注カートを直接開くURL。空欄なら在庫管理のトップを開きます（管理者だけに表示）
   stockCart: '' };
 const AUTO_REFRESH_MIN = 5;
@@ -339,12 +452,16 @@ const IC = {
   cart: SVG('<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/>'),
   cal: SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
   drop: SVG('<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'),
+  next: SVG('<path d="M9 6l6 6-6 6"/>'),
+  x: SVG('<path d="M6 6l12 12M18 6L6 18"/>'),
+  more: SVG('<circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/>'),
+  out: SVG('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>'),
   list: SVG('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke-width="3"/>')
 };
 
 const S = { shiftDay: 0, tkEdit: null, model: null, source: '', sourceLabel: '', loadedAt: '', error: '', filter: 'すべて', series: 0, showAll: false, busy: false, auth: null, loginMsg: '', localAt: '',
   folderMode: location.protocol === 'file:', dir: null, dirName: '', fileInfo: '', calMonth: '', calDay: '' };
-S.sel = (() => { try { return localStorage.getItem('medash_sel') || 'plan'; } catch (e) { return 'plan'; } })();
+S.open = ''; S.menu = false;
 let OPEN = new Set((() => { try { return JSON.parse(localStorage.getItem('medash_open') || '[]'); } catch (e) { return []; } })());
 const saveOpen = () => { try { localStorage.setItem('medash_open', JSON.stringify([...OPEN])); } catch (e) { } };
 /* ---------- ログイン（在庫管理のユーザー番号。管理者・使用者、その日のうちだけ有効） ---------- */
@@ -517,66 +634,133 @@ const rows = n => S.model[n] || [];
 function render() {
   renderNav();
   const main = $('#main');
-  if (S.folderMode && !S.model && !S.wantLogin) { main.innerHTML = folderView(); return; }
-  if (API_URL && !S.auth && S.source !== 'excel' && S.source !== 'local') { main.innerHTML = loginView(); const i = $('#loginId'); if (i && !S.busy) i.focus(); return; }
+  const drB = document.querySelector('.dr-b'), keepTop = drB ? drB.scrollTop : 0, keepId = drB ? drB.dataset.id : '';
+  if (S.folderMode && !S.model && !S.wantLogin) { main.innerHTML = folderView(); drawer(null); return; }
+  if (API_URL && !S.auth && S.source !== 'excel' && S.source !== 'local') { main.innerHTML = loginView(); drawer(null); const i = $('#loginId'); if (i && !S.busy) i.focus(); return; }
   if (!S.model) {
     main.innerHTML = `${topBar(null)}${S.error ? `<div class="banner err">${esc(S.error)}</div>` : ''}
       <div class="card"><h2>データがまだありません</h2>
       <p class="muted">${API_URL ? '集約データを読み込んでいます。' : '集約用GASのURLが未設定です。'}毎日出力されるダッシュボードのExcel（ME業務ダッシュボード_最新.xlsx など）を開くと、同じ画面で表示できます。</p>
       <button class="btn pri" data-act="xlsx">${IC.file}Excelを開く</button></div>`;
+    drawer(null);
     return;
   }
   const s = sumMap();
   const W = widgets(s), map = {};
   W.forEach(w => map[w.id] = w);
-  if (!map[S.sel]) S.sel = 'plan';
+  const st = sourceStatus(s);
   main.innerHTML = `
     ${topBar(s)}
-    ${S.error ? `<div class="banner err">${esc(S.error)}<button class="btn" data-act="xlsx">${IC.file}Excelから表示</button></div>` : ''}
-    ${(() => { const st = sourceStatus(s); return st.ng.length && !st.stale ? `<div class="banner warn-b">⚠ ${st.ng.map(n => esc(n.name)).join('・')}のデータを、最新の集約（${esc(st.latest.slice(11, 16))}）で取得できませんでした。表示しているのは${st.ng.map(n => esc(n.name) + ' ' + esc(n.at ? n.at.slice(11, 16) : '—')).join('、')}時点の内容です。</div>` : ''; })()}
-    ${S.source === 'excel' ? `<div class="banner info">${S.fileInfo ? 'フォルダの最新Excel：' + esc(S.fileInfo) + '　' : 'Excelファイルの'}内容を表示しています（データ ${esc(s['更新日時'] || '')} 時点）。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
-    ${S.source === 'local' ? `<div class="banner info">${window.DASHBOARD_EMBEDDED ? 'このファイルに保存されたデータ' : 'このパソコンに同期されたデータ'}（${esc(S.localAt)} 時点）を表示しています。インターネットがなくても見られますが、最新ではありません。${API_URL ? '<button class="btn" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
-    ${kpis(s)}
-    ${miniTiles(map)}
-    ${panelHtml(map[S.sel])}`;
+    ${S.error ? `<div class="banner err">${esc(S.error)}<button class="btn sm" data-act="xlsx">${IC.file}Excelから表示</button></div>` : ''}
+    ${st.ng.length && !st.stale ? `<div class="banner warn-b">${st.ng.map(n => esc(n.name)).join('・')}のデータを最新の集約で取得できませんでした（${st.ng.map(n => esc(n.name) + ' ' + esc(n.at ? n.at.slice(11, 16) : '—')).join('、')} 時点の内容です）</div>` : ''}
+    ${st.stale ? `<div class="banner warn-b">集約が止まっています（最終 ${esc(st.latest.slice(5, 16))}）。集約用GASのトリガーを確認してください</div>` : ''}
+    ${S.source === 'excel' ? `<div class="banner info">${S.fileInfo ? 'フォルダの最新Excel：' + esc(S.fileInfo) + '　' : 'Excelファイルの'}内容を表示しています（${esc(s['更新日時'] || '')} 時点）${API_URL ? '<button class="btn sm" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
+    ${S.source === 'local' ? `<div class="banner info">${window.DASHBOARD_EMBEDDED ? 'このファイルに保存されたデータ' : 'このパソコンに同期されたデータ'}（${esc(S.localAt)} 時点）を表示しています${API_URL ? '<button class="btn sm" data-act="tologin">ログインして最新を表示</button>' : ''}</div>` : ''}
+    ${statTiles(map)}
+    <div class="cols">${todoCard(s)}${todayCard(map, s)}</div>`;
+  drawer(S.open ? map[S.open] : null);
+  const nb = document.querySelector('.dr-b');
+  if (nb && nb.dataset.id === keepId) nb.scrollTop = keepTop;
 }
 
-/* 4つの数字の下に並べる小さなボタン（数字で表しきれない項目） */
-function miniTiles(map) {
-  const MINI = [['shift', '勤務・業務'], ['plan', '予定'], ['cons', '血ガス消耗品'], ['log', '今日の記録'], ['pic', '写真・完了率']];
-  return `<nav class="minis" aria-label="そのほかの項目">${MINI.map(([id, label]) => {
-    const w = map[id];
-    return `<button class="mini ${S.sel === id ? 'on' : ''} ${w.level ? 'lv-b-' + w.level : ''}" data-act="sel" data-w="${id}" aria-pressed="${S.sel === id}">
-      <span class="mi" style="color:${w.color}">${w.icon}</span><span class="ml">${label}</span><span class="mv">${w.mini || ''}</span></button>`;
-  }).join('')}</nav>`;
+/* ---- 数字のタイル：押すと右（スマホは全画面）に詳しい内容が開く ---- */
+function statTiles(map) {
+  return `<section class="tiles" aria-label="今日の数字">${['today', 'oxy', 'cons', 'stock'].map(id => {
+    const w = map[id], t = w.stat;
+    return `<button class="tile" data-act="sel" data-w="${id}" aria-haspopup="dialog">
+      <span class="tl"><i class="sd ${t.lv ? 'sd-' + t.lv : ''}"></i>${esc(t.label)}<span class="tc">${IC.next}</span></span>
+      <span class="tv"><b class="${t.lv && t.color !== false ? 'lv-' + t.lv : ''}">${esc(t.v)}</b><small>${esc(t.unit)}</small></span>
+      ${t.bar != null ? `<span class="bar"><i style="width:${t.bar}%"></i></span>` : ''}
+      <span class="ts">${esc(t.sub)}</span></button>`;
+  }).join('')}</section>`;
 }
 
-/* 選んだ項目の詳細（PCでは画面の残りの高さに収め、中だけスクロール） */
-function panelHtml(w) {
-  return `<section class="card panel ${w.level ? 'lv-b-' + w.level : ''}" aria-labelledby="ph-${w.id}">
-    <div class="ph"><span class="w-ic" style="color:${w.color}">${w.icon}</span>
-      <div class="pt"><h2 id="ph-${w.id}">${esc(w.title)}</h2><div class="w-s">${w.summary}</div></div>
-      ${w.link ? `<a class="pl" href="${esc(w.link[0])}">${esc(w.link[1])} ›</a>` : ''}</div>
-    <div class="pb">${w.body}</div>
+/* ---- 要対応：至急・注意だけを出し、未実施は1行にまとめる ---- */
+const SEV_LV = { '至急': 'alert', '注意': 'warn', '未実施': 'idle' };
+function dueText(v) {
+  const m = String(v || '').match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (!m) return String(v || '');
+  const iso = `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`, today = refDay();
+  const diff = Math.round((Date.UTC(+m[1], m[2] - 1, +m[3]) - Date.UTC(+today.slice(0, 4), today.slice(5, 7) - 1, +today.slice(8, 10))) / 864e5);
+  return diff < 0 ? `${-diff}日超過` : diff === 0 ? '今日' : diff === 1 ? '明日' : `${md(iso)}`;
+}
+function todoRow(r) {
+  const sev = r['緊急度'], src = r['業務'], href = link(src);
+  const act = src === '勤務' ? `<button class="go" data-act="sel" data-w="shift" aria-label="勤務・業務を開く">${IC.next}</button>`
+    : href ? `<a class="go" href="${esc(href)}" aria-label="${esc(src)}を開く">${IC.next}</a>` : '<span></span>';
+  return `<li class="ti"><i class="sd sd-${SEV_LV[sev] || 'idle'}" title="${esc(sev)}"></i>
+    <div class="tx"><b>${esc(r['内容'])}</b><small><span class="src src-${esc(src)}">${esc(src)}</span>${r['詳細'] ? esc(r['詳細']) : ''}</small></div>
+    <span class="due due-${SEV_LV[sev] || 'idle'}">${esc(dueText(r['期限']))}</span>${act}</li>`;
+}
+function todoCard(s) {
+  const all = rows('要対応');
+  const hot = all.filter(r => r['緊急度'] !== '未実施'), idle = all.filter(r => r['緊急度'] === '未実施');
+  const n = k => num(s[k]) || 0;
+  const MAX = 6;
+  return `<section class="card todo-card" aria-labelledby="h-todo">
+    <div class="hd"><h2 id="h-todo">要対応</h2>
+      <span class="cnt">${n('至急') ? `<span class="c-alert">至急 ${n('至急')}</span>` : ''}${n('注意') ? `<span class="c-warn">注意 ${n('注意')}</span>` : ''}</span>
+      ${all.length ? `<button class="lk" data-act="sel" data-w="todo">すべて ${all.length}件 ›</button>` : ''}</div>
+    ${hot.length ? `<ul class="tl-list">${hot.slice(0, MAX).map(todoRow).join('')}</ul>` : `<p class="allok">${IC.check}急いで対応するものはありません</p>`}
+    ${hot.length > MAX ? `<button class="more-l" data-act="sel" data-w="todo">ほか ${hot.length - MAX} 件</button>` : ''}
+    ${idle.length ? `<button class="idle" data-act="sel" data-w="todo"><i class="sd sd-idle"></i><span>未実施 ${idle.length}件</span><small>${esc(idle.slice(0, 4).map(r => r['場所'] || r['内容']).join('・'))}${idle.length > 4 ? ' ほか' : ''}</small></button>` : ''}
   </section>`;
 }
 
-/* 1つの項目（ウィジェット）：見出し＋要約。押すと詳細が開く */
-function widgetHtml(w) {
-  const open = OPEN.has(w.id);
-  return `<section class="card w ${open ? 'open' : ''} ${w.level ? 'lv-b-' + w.level : ''}" id="w-${w.id}">
-    <button class="w-h" data-act="toggle" data-w="${w.id}" aria-expanded="${open}" aria-controls="wb-${w.id}">
-      <span class="w-ic" style="color:${w.color || 'var(--accent)'}">${w.icon}</span>
-      <span class="w-m"><b>${esc(w.title)}</b><span class="w-s">${w.summary}</span></span>
-      <span class="w-c" aria-hidden="true">${IC.chev}</span>
-    </button>
-    ${open ? `<div class="w-b" id="wb-${w.id}">${w.body}${w.link ? `<div class="w-l"><a href="${esc(w.link[0])}">${esc(w.link[1])} ›</a></div>` : ''}</div>` : ''}
+/* ---- 今日：予定と業務の担当（くわしくは開いて見る） ---- */
+function todayCard(map, s) {
+  const today = refDay();
+  const cal = rows('カレンダー').filter(r => r['日付'] === today).sort((a, b) => (a['開始'] || '') < (b['開始'] || '') ? -1 : 1);
+  const sys = rows('予定').filter(r => r['日付'] === today);
+  const now = new Date(), hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const ev = cal.map(r => `<li class="${!r['終日'] && r['終了'] && r['終了'] < hm && S.source === 'api' ? 'past' : ''}"><span class="tm">${r['終日'] ? '終日' : esc(r['開始'])}</span><span>${esc(r['件名'])}${r['場所'] ? `<small>${esc(r['場所'])}</small>` : ''}</span></li>`)
+    .concat(sys.map(r => `<li><span class="tm">見込み</span><span>${esc(r['内容'])}</span></li>`));
+  const tk = rows('業務担当').filter(r => r['日付'] === today);
+  const names = r => String(r['担当'] || '').split('・').filter(Boolean);
+  const none = tk.length && !tk.some(r => names(r).length) && (num(s['出勤_技士']) || 0) > 0;
+  const ce = num(s['出勤_技士']), sp = num(s['出勤_サポーター']);
+  const shiftOk = rows('今日の勤務').length || tk.length;
+  return `<section class="card day-card" aria-label="今日">
+    <div class="hd"><h2>今日の予定</h2><button class="lk" data-act="sel" data-w="plan">7日間 ›</button></div>
+    ${ev.length ? `<ul class="evs">${ev.slice(0, 5).join('')}</ul>${ev.length > 5 ? `<button class="more-l" data-act="sel" data-w="plan">ほか ${ev.length - 5} 件</button>` : ''}` : '<p class="nil">今日の予定はありません</p>'}
+    ${shiftOk ? `<div class="hd hd2"><h2>業務の担当</h2><button class="lk" data-act="sel" data-w="shift">勤務 ›</button></div>
+      ${none ? `<button class="tkwarn2" data-act="sel" data-w="shift">${IC.alert}<span>担当割りがまだありません</span><b>割り当てる</b></button>` : ''}
+      ${tk.length && !none ? `<div class="tkc">${tk.map(r => `<span class="${names(r).length ? '' : 'un'}"><i style="background:${esc(r['色'] || 'var(--accent)')}">${esc(r['略称'] || String(r['業務']).slice(0, 1))}</i>${esc(names(r).join('・') || '未割当')}</span>`).join('')}</div>` : ''}
+      <p class="staff">出勤　技士 <b>${ce ?? '—'}</b>人・サポーター <b>${sp ?? '—'}</b>人</p>` : ''}
   </section>`;
 }
 
-/* 新しい情報を足すときは、この一覧に1つ追加するだけ */
+/* ---- くわしい内容（ドロワー） ---- */
+function drawer(w) {
+  const el = $('#drawer');
+  document.body.classList.toggle('dr-open', !!w);
+  if (!w) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="dr-bg" data-act="dclose"></div>
+    <section class="dr" role="dialog" aria-modal="true" aria-labelledby="dr-t">
+      <header class="dr-h"><span class="w-ic" style="color:${w.color}">${w.icon}</span><h2 id="dr-t">${esc(w.title)}</h2>
+        ${w.link ? `<a class="dr-l" href="${esc(w.link[0])}"${w.id === 'shift' ? ' target="_blank" rel="noopener"' : ''}>${esc(w.link[1])} ›</a>` : ''}
+        <button class="ib" data-act="dclose" aria-label="閉じる">${IC.x}</button></header>
+      <div class="dr-b" data-id="${w.id}">${w.body}</div>
+    </section>`;
+}
+
+/* 新しい情報を足すときは、この一覧に1つ追加し、statTiles か todayCard から開けるようにする */
 function widgets(s) {
-  return [todoW(s), oxyW(), todayW(), planW(), stockW(s), consW(), logW(), picW(), shiftW(s)];
+  const today = todayW(), log = logW(), pic = picW(), oxy = oxyW(), cons = consW(), stock = stockW(s);
+  // 点検：進み具合・今日の記録・写真と完了率をまとめて1つに
+  today.body += `<h3 class="sec">今日の記録</h3>${log.body}<h3 class="sec">写真・点検完了率</h3>${pic.body}`;
+  today.link = LINKS.round ? [LINKS.round, 'ラウンド点検へ'] : null;
+  const done = num(s['点検_完了']) || 0, total = num(s['点検_総数']) || 0, pct = total ? Math.round(done / total * 100) : 0;
+  const bad = rows('今日の状況').reduce((n, r) => n + (num(r['異常数']) || 0), 0);
+  today.stat = { color: false, label: '今日の点検', v: pct, unit: '%', bar: pct, lv: bad ? 'alert' : '', sub: bad ? `異常 ${bad}件` : total - done ? `残り ${total - done} 項目` : 'すべて完了' };
+  const od = num(s['酸素_最短日数']);
+  oxy.stat = { label: '酸素の残り', v: od === null ? '—' : od >= 100 ? '100+' : od, unit: '日', lv: od === null ? '' : od <= 3 ? 'alert' : od <= 7 ? 'warn' : '', sub: s['酸素_最短場所'] ? `最短：${s['酸素_最短場所']}` : '' };
+  const c = rows('残量').filter(r => r['業務'] === 'ラウンド');
+  const ca = c.filter(r => r['状態'] === 'alert').length, cw = c.filter(r => r['状態'] === 'warn').length;
+  cons.stat = { label: '血ガス消耗品', v: ca || cw, unit: ca ? '件 交換' : cw ? '件 注意' : '件', lv: ca ? 'alert' : cw ? 'warn' : '', sub: ca && cw ? `ほかに注意 ${cw}件` : ca || cw ? '期限・残回数' : 'すべて余裕あり' };
+  const need = num(s['在庫_要発注']) || 0, out = rows('在庫').filter(r => r['状態'] === '在庫切れ').length;
+  stock.stat = { label: '在庫 要発注', v: need, unit: '品目', lv: out ? 'alert' : need ? 'warn' : '', sub: `${out ? `在庫切れ ${out}・` : ''}発注中 ${num(s['在庫_発注中']) || 0}件` };
+  return [todoW(s), oxy, today, planW(), stock, cons, shiftW(s)];
 }
 function loginView() {
   return `<div class="login card">
@@ -596,35 +780,27 @@ document.addEventListener('input', e => {
 
 function topBar(s) {
   const now = new Date();
-  const date = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）`;
-  const stale = s && isStale(s['更新日時']);
+  const date = `${now.getMonth() + 1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）`;
+  const st = s ? sourceStatus(s) : null;
+  let sync = '';
+  if (s && S.source === 'api') {
+    const at = esc(String(s['更新日時'] || '').slice(11, 16));
+    const lv = st.stale || st.ng.length ? 'warn' : 'ok';
+    sync = `<button class="sync sync-${lv}" data-act="refresh" ${S.busy ? 'disabled' : ''} title="今すぐ更新"><i class="sd sd-${lv === 'ok' ? 'ok' : 'warn'}"></i>${S.busy ? '更新中…' : (st.stale ? '更新が止まっています' : st.ng.length ? at + ' 一部取得できず' : at + ' 更新')}${IC.refresh}</button>`;
+  } else if (s) sync = `<span class="sync">${IC.file}${esc(S.sourceLabel)}</span>`;
   return `<header class="top">
-    <div class="ttl"><h1>ダッシュボード</h1><div class="sub">${date}${s ? '　データ ' + esc(s['更新日時'] || '—') + ' 時点' : ''}</div></div>
-    ${S.source === 'excel' && S.dir ? `<button class="btn" data-act="dirload">${IC.refresh}<span class="hide-sp">フォルダを読み直す</span></button>` : ''}
-    ${s ? (S.source === 'excel' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : S.source === 'local' ? `<span class="pill xl">${IC.file}${esc(S.sourceLabel)}</span>` : stale ? `<span class="pill warn">更新が止まっています</span>` : sourceStatus(s).ng.length ? `<span class="pill warn">一部取得できず</span>` : `<span class="pill ok">${IC.check}すべて同期済み</span>`) : ''}
-    ${API_URL && S.auth && S.source !== 'local' && S.source !== 'excel' ? `<button class="btn" data-act="refresh" ${S.busy ? 'disabled' : ''}>${IC.refresh}<span class="hide-sp">${S.busy ? '更新中…' : '今すぐ更新'}</span></button>` : ''}
-    <button class="btn" data-act="xlsx" title="Excelから表示">${IC.file}<span class="hide-sp">Excel</span></button>
-    <button class="btn" data-act="theme" aria-label="表示の切り替え">${IC.moon}</button>
-    ${S.auth ? `<span class="userpill top-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></span>`
-      : S.source === 'excel' && API_URL ? `<button class="btn" data-act="tologin">ログイン</button>` : ''}
+    <div class="ttl"><h1>${date}</h1>${S.auth ? `<span class="sub">${esc(S.auth.name)}さん</span>` : ''}</div>
+    ${S.source === 'excel' && S.dir ? `<button class="btn sm" data-act="dirload">${IC.refresh}<span class="hide-sp">フォルダを読み直す</span></button>` : ''}
+    ${sync}
+    <div class="menu-w"><button class="ib" data-act="menu" aria-haspopup="menu" aria-expanded="${!!S.menu}" aria-label="そのほかの操作">${IC.more}</button>
+      ${S.menu ? `<div class="menu" role="menu">
+        <button role="menuitem" data-act="xlsx">${IC.file}Excelから表示</button>
+        <button role="menuitem" data-act="theme">${IC.moon}明るさを切り替え</button>
+        ${S.auth ? `<button role="menuitem" data-act="logout">${IC.out}ログアウト（${esc(S.auth.name)}）</button>` : S.source === 'excel' && API_URL ? `<button role="menuitem" data-act="tologin">ログイン</button>` : ''}
+      </div>` : ''}</div>
   </header>`;
 }
 function isStale(t) { const m = String(t || '').match(/(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/); if (!m) return false; return (Date.now() - new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]).getTime()) > 40 * 60000; }
-
-function kpis(s) {
-  const done = num(s['点検_完了']) || 0, total = num(s['点検_総数']) || 0, pct = total ? Math.round(done / total * 100) : 0;
-  const oxyD = num(s['酸素_最短日数']);
-  const oxyCls = oxyD === null ? '' : oxyD <= 3 ? 'lv-alert' : oxyD <= 7 ? 'lv-warn' : 'lv-ok';
-  const nAll = (num(s['至急']) || 0) + (num(s['注意']) || 0) + (num(s['未実施']) || 0);
-  return `<section class="kpis" aria-label="今日の概要">
-    <button class="card kpi ${S.sel === 'todo' ? 'on' : ''}" data-act="sel" data-w="todo" aria-pressed="${S.sel === 'todo'}"><span class="l">要対応</span><div class="v"><b>${nAll}</b><span>件</span></div>
-      <div class="tags"><span class="tag sev-至急">至急 ${esc(s['至急'] || 0)}</span><span class="tag sev-注意">注意 ${esc(s['注意'] || 0)}</span><span class="tag sev-未実施">未実施 ${esc(s['未実施'] || 0)}</span></div></button>
-    <button class="card kpi ${S.sel === 'today' ? 'on' : ''}" data-act="sel" data-w="today" aria-pressed="${S.sel === 'today'}"><span class="l">本日の点検</span><div class="v"><b>${pct}</b><span>%</span></div><div class="bar"><i style="width:${pct}%"></i></div>
-      <span class="s">ラウンド ${esc(s['ラウンド_完了'] || 0)}/${esc(s['ラウンド_総数'] || 0)}　医療ガス ${esc(s['医療ガス_完了'] || 0)}/${esc(s['医療ガス_総数'] || 0)} 項目</span></button>
-    <button class="card kpi ${S.sel === 'oxy' ? 'on' : ''}" data-act="sel" data-w="oxy" aria-pressed="${S.sel === 'oxy'}"><span class="l">酸素 最短の残り日数</span><div class="v"><b class="${oxyCls}">${oxyD === null ? '—' : oxyD >= 100 ? '100+' : oxyD}</b><span>日</span></div><span class="s">${esc(s['酸素_最短場所'] || '')}</span></button>
-    <button class="card kpi ${S.sel === 'stock' ? 'on' : ''}" data-act="sel" data-w="stock" aria-pressed="${S.sel === 'stock'}"><span class="l">在庫 要発注</span><div class="v"><b>${esc(s['在庫_要発注'] || 0)}</b><span>品目</span></div><span class="s">発注中 ${esc(s['在庫_発注中'] || 0)}件　今月の発注額 ${yen(s['在庫_今月発注額'])}</span></button>
-  </section>`;
-}
 
 function link(src) { return { 'ラウンド': LINKS.round, '医療ガス': LINKS.gas, '在庫': LINKS.stock }[src] || ''; }
 const dot = lv => `<i class="dot dot-${lv}"></i>`;
@@ -632,16 +808,12 @@ function todoW(s) {
   const all = rows('要対応');
   let list = all;
   if (S.filter !== 'すべて') list = list.filter(r => r['業務'] === S.filter);
-  const max = S.showAll ? list.length : 10;
+  const max = S.showAll ? list.length : 30;
   const top = all.find(r => r['緊急度'] === '至急') || all.find(r => r['緊急度'] === '注意');
-  const body = `<div class="chips" style="margin-bottom:8px">${['すべて', 'ラウンド', '医療ガス', '在庫'].concat(all.some(r => r['業務'] === '勤務') ? ['勤務'] : []).map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div>
-    ${list.length ? `<ul class="todo">${list.slice(0, max).map(r => {
-      const sev = r['緊急度'], src = r['業務'], href = link(src);
-      return `<li><span class="sev"><span class="tag sev-${esc(sev)}">${esc(sev)}</span></span><span class="src"><span class="tag src-${esc(src)}">${esc(src)}</span></span>
-        <span class="c"><b>${esc(r['内容'])}</b>${r['詳細'] ? `<span>　${esc(r['詳細'])}</span>` : ''}</span>
-        <span class="due ${esc(sev)}">${esc(r['期限'])}</span><span class="a">${src === '勤務' ? `<button class="lnk" data-act="sel" data-w="shift">開く</button>` : href ? `<a href="${esc(href)}">開く</a>` : ''}</span></li>`;
-    }).join('')}</ul>` : '<p class="empty">対応が必要なものはありません</p>'}
-    ${list.length > max ? `<div class="more"><button class="btn" data-act="more">残り ${list.length - max} 件を表示</button></div>` : ''}`;
+  const srcs = ['すべて'].concat(['ラウンド', '医療ガス', '在庫', '勤務'].filter(f => all.some(r => r['業務'] === f)));
+  const body = `${srcs.length > 2 ? `<div class="chips">${srcs.map(f => `<button class="${S.filter === f ? 'on' : ''}" data-act="filter" data-f="${f}">${f}</button>`).join('')}</div>` : ''}
+    ${list.length ? `<ul class="tl-list">${list.slice(0, max).map(todoRow).join('')}</ul>` : '<p class="empty">対応が必要なものはありません</p>'}
+    ${list.length > max ? `<button class="more-l" data-act="more">残り ${list.length - max} 件を表示</button>` : ''}`;
   const n = k => num(s[k]) || 0;
   return { id: 'todo', title: '要対応', icon: IC.alert, color: n('至急') ? 'var(--red)' : n('注意') ? 'var(--yel)' : 'var(--grn)',
     level: n('至急') ? 'alert' : n('注意') ? 'warn' : '',
@@ -727,9 +899,9 @@ function planW() {
 function stockW(s) {
   const need = rows('在庫').filter(r => r['状態'] === '在庫切れ' || r['状態'] === '要発注');
   const out = need.filter(r => r['状態'] === '在庫切れ').length;
-  const body = `<div class="stockk"><div class="hot"><span>要発注</span><b>${esc(s['在庫_要発注'] || 0)}</b></div><div><span>発注中</span><b>${esc(s['在庫_発注中'] || 0)}</b></div><div><span>今月の発注額</span><b style="font-size:16px">${yen(s['在庫_今月発注額'])}</b></div></div>
+  const body = `<p class="kv"><span>発注中 <b>${esc(s['在庫_発注中'] || 0)}</b>件</span><span>今月の発注額 <b>${yen(s['在庫_今月発注額'])}</b></span><span>在庫の評価額 <b>${yen(s['在庫_評価額'])}</b></span></p>
     ${need.length ? `<ul class="list stl">${need.map(r => `<li><span class="n">${esc(r['物品名'])}</span><span class="q ${r['状態'] === '在庫切れ' ? 'lv-alert' : 'lv-warn'}">在庫 ${esc(r['在庫数'])}</span><span class="p">発注点 ${esc(r['発注点'])}</span></li>`).join('')}</ul>` : '<p class="empty">発注が必要な物品はありません</p>'}
-    <span class="muted" style="font-size:12px;display:block;margin-top:8px">在庫の評価額 ${yen(s['在庫_評価額'])}</span>`;
+`;
   return { id: 'stock', title: '在庫', icon: IC.stock, color: 'var(--t-stock)', level: out ? 'alert' : need.length ? 'warn' : '',
     summary: `<span class="w-k">要発注 <b>${esc(s['在庫_要発注'] || 0)}</b></span>${out ? `<span class="w-k lv-alert">在庫切れ <b>${out}</b></span>` : ''}<span class="w-k">発注中 <b>${esc(s['在庫_発注中'] || 0)}</b></span><span class="w-k">今月 <b>${yen(s['在庫_今月発注額'])}</b></span>`,
     body: body + (isAdminUser() && (LINKS.stockCart || LINKS.stock) ? `<a class="big" href="${esc(LINKS.stockCart || LINKS.stock)}">${IC.cart}<span style="margin-left:8px">発注カートを開く${need.length ? `（要発注 ${need.length}品目）` : ''}</span></a>` : ''),
@@ -816,7 +988,9 @@ const d0 = (d, today) => d === today ? '今日' : md(d) + '（' + wd(d) + '）';
 function shiftAppUrl() {
   const base = shiftBase();
   if (!base) return '';
-  return base + (base.includes('?') ? '&' : '?') + 't=' + encodeURIComponent(S.auth ? S.auth.token : '');
+  const t = encodeURIComponent(S.auth ? S.auth.token : '');
+  // GAS の画面は ?t=、GitHub の画面は #t=（URLの#以降はサーバーに送られない）
+  return /script\.google\.com/.test(base) ? base + (base.includes('?') ? '&' : '?') + 't=' + t : base.replace(/#.*$/, '') + '#t=' + t;
 }
 
 /* 担当割りの保存：押すたびに自動で保存（続けて押したときはまとめて1回）。集約用GAS → MEシフトのスプレッドシート */
@@ -928,9 +1102,6 @@ function miniCalHtml() {
 }
 
 function renderNav() {
-  $('#minical').innerHTML = miniCalHtml();
-  $('#minical').style.display = S.model ? '' : 'none';
-  const s = S.model ? sumMap() : {};
   const n = src => rows('要対応').filter(r => r['業務'] === src && r['緊急度'] !== '未実施').length;
   const items = [['dash', 'ダッシュボード', '#', 0, true], ['round', 'ラウンド点検', LINKS.round, S.model ? n('ラウンド') : 0], ['gas', '医療ガス点検', LINKS.gas, S.model ? n('医療ガス') : 0], ['stock', '在庫管理', LINKS.stock, S.model ? n('在庫') : 0]];
   // 管理者だけ：シフト管理（ダッシュボードの通行証を付けて開く。MEシフト側で管理者か確認する）
@@ -938,17 +1109,14 @@ function renderNav() {
   $('#nav').innerHTML = items.map(i => i[2]
     ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}<span>${i[1]}</span>${i[3] ? `<span class="cnt">${i[3]}</span>` : ''}</a>`
     : `<a class="off" aria-disabled="true" title="URL未設定">${IC[i[0]]}<span>${i[1]}</span><small>未設定</small></a>`).join('');
-  $('#tabbar').innerHTML = items.map(i => {
-    const label = i[0] === 'dash' ? 'ダッシュボード' : i[1].replace('点検', '').replace('管理', '');
-    return i[2] ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}${label}</a>`
+  const tb = $('#tabbar');
+  tb.style.gridTemplateColumns = `repeat(${items.length},minmax(0,1fr))`;
+  tb.innerHTML = items.map(i => {
+    const label = i[0] === 'dash' ? 'ホーム' : i[1].replace('点検', '').replace('管理', '');
+    return i[2] ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}${label}${i[3] ? `<i class="tbn">${i[3]}</i>` : ''}</a>`
       : `<a aria-disabled="true" style="opacity:.45">${IC[i[0]]}${label}</a>`;
   }).join('');
-  const st = S.model ? sourceStatus(s) : { latest: '', ng: [], stale: false };
-  $('#srcbox').innerHTML = `${S.auth ? `<div class="side-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout">ログアウト</button></div>` : ''}
-    <span class="h">データの状態</span>
-    ${S.model ? `<div class="r"><span>最終取得</span><span class="${st.stale ? 'src-ng' : 'src-ok'}">${st.latest ? esc(st.latest.slice(5, 16).replace('/', '/')) : '—'}</span></div>
-      ${st.stale ? '<div class="src-ng">⚠ 集約が止まっています</div>' : st.ng.length ? st.ng.map(n => `<div class="src-ng">⚠ ${esc(n.name)}：取得できず（最終 ${esc(n.at ? n.at.slice(11, 16) : '—')}）</div>`).join('') : '<div class="src-ok">✓ すべて取得できています</div>'}` : ''}
-    <span class="h" style="margin-top:6px">表示中：${esc(S.sourceLabel || '—')}</span>`;
+  $('#srcbox').innerHTML = S.auth ? `<div class="side-user"><span class="av">${esc(String(S.auth.name).slice(0, 1))}</span><span><b>${esc(S.auth.name)}</b><small>${esc(S.auth.role)}</small></span><button data-act="logout" aria-label="ログアウト" title="ログアウト">${IC.out}</button></div>` : '';
 }
 /* 3業務の最終取得時刻をまとめる。一番新しい時刻から15分以上遅れている業務は「取得できず」 */
 function sourceStatus(s) {
@@ -964,16 +1132,17 @@ function sourceStatus(s) {
 /* =================== 操作 =================== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
+  if (S.menu && (!b || b.dataset.act !== 'menu')) { S.menu = false; render(); if (!b) return; }
   if (!b || b.disabled) return;
   const a = b.dataset.act;
+  if (a === 'menu') { S.menu = !S.menu; render(); return; }
+  if (a === 'dclose') { flushTaskSave(); S.open = ''; S.tkEdit = null; S.calDay = ''; render(); return; }
   if (a === 'refresh') loadApi(true);
   else if (a === 'logout') logout('');
   else if (a === 'dirpick') chooseDir();
   else if (a === 'calday') {
-    S.calDay = b.dataset.d === S.calDay ? '' : b.dataset.d; S.sel = 'plan'; S.calMonth = b.dataset.d.slice(0, 7);
-    try { localStorage.setItem('medash_sel', 'plan'); } catch (er) { }
+    S.calDay = b.dataset.d === S.calDay ? '' : b.dataset.d; S.open = 'plan'; S.calMonth = b.dataset.d.slice(0, 7);
     render();
-    if (matchMedia('(max-width:960px)').matches) { const el = document.querySelector('.panel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
   else if (a === 'calmon') {
     const [y, m] = (S.calMonth || refDay().slice(0, 7)).split('-').map(Number);
@@ -982,10 +1151,10 @@ document.addEventListener('click', e => {
   else if (a === 'calreset') { S.calDay = ''; S.calMonth = ''; render(); }
   else if (a === 'dirload') loadFromDir(true);
   else if (a === 'sel') {
-    S.sel = b.dataset.w; S.showAll = false;
-    try { localStorage.setItem('medash_sel', S.sel); } catch (er) { }
+    S.open = b.dataset.w; S.showAll = false; S.filter = 'すべて';
     render();
-    if (matchMedia('(max-width:960px)').matches) { const el = document.querySelector('.panel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const d = document.querySelector('.dr-b'); if (d) d.scrollTop = 0;
+    const c = document.querySelector('.dr .ib'); if (c) c.focus({ preventScroll: true });
   }
   else if (a === 'toggle' || a === 'openw') {
     const id = b.dataset.w;
@@ -1020,6 +1189,10 @@ document.addEventListener('click', e => {
     document.documentElement.dataset.theme = next;
     try { localStorage.setItem('medash_theme', next); } catch (er) { }
   }
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (S.menu) { S.menu = false; render(); } else if (S.open) { flushTaskSave(); S.open = ''; S.tkEdit = null; S.calDay = ''; render(); }
 });
 document.addEventListener('change', e => { if (e.target.dataset.act === 'series') { S.series = +e.target.value; render(); } });
 
