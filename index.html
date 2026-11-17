@@ -184,6 +184,7 @@ button.kpi:hover{border-color:var(--accent)}
 .tked .opts button small{display:block;font-size:11px;opacity:.75;line-height:1.1}
 .tked .acts{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
 .tked .msg{color:var(--red);font-size:13px;margin-right:auto}
+.tked .acts [role=status]{font-size:13px;color:var(--muted)}.tked .st-saved{color:var(--grn)!important;font-weight:700}.tked .st-saving,.tked .st-pending{color:var(--accent)!important}
 .btn.pri-s{background:var(--accent);border-color:var(--accent);color:#fff}
 .mini{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
 .mini:hover{border-color:var(--accent)}
@@ -349,6 +350,7 @@ const saveOpen = () => { try { localStorage.setItem('medash_open', JSON.stringif
 /* ---------- ログイン（在庫管理のユーザー番号。管理者・使用者、その日のうちだけ有効） ---------- */
 function loadAuth() { try { const a = JSON.parse(localStorage.getItem('medash_auth') || 'null'); return a && a.day === todayStr() ? a : null; } catch (e) { return null; } }
 function logout(msg) {
+  setLinks({});
   S.auth = null; S.model = null; S.source = ''; S.sourceLabel = ''; S.loginMsg = msg || '';
   try { localStorage.removeItem('medash_auth'); localStorage.removeItem('medash_model'); } catch (e) { }
   render();
@@ -384,6 +386,7 @@ async function loadApi(refresh) {
     const j = await r.json();
     if (j.auth) { S.busy = false; logout('ログインの有効期限が切れました。もう一度ユーザー番号を入力してください'); return false; }
     if (!j.ok) throw new Error(j.error || '応答が不正です');
+    setLinks(j.links);
     setModel(j.data, 'api', '集約データ');
     S.error = '';
     return true;
@@ -494,6 +497,13 @@ addEventListener('dragleave', () => { if (--dragN <= 0) { dragN = 0; $('#drop').
 addEventListener('dragover', e => e.preventDefault());
 addEventListener('drop', e => { e.preventDefault(); dragN = 0; $('#drop').classList.remove('on'); const f = e.dataTransfer.files[0]; if (f) loadExcelFile(f); });
 
+/* 管理者には集約用GASからシフト管理のURLが届く（LINKS.shift が空でも使える） */
+let SRV_LINKS = (() => { try { return JSON.parse(localStorage.getItem('medash_links') || '{}'); } catch (e) { return {}; } })();
+function setLinks(l) {
+  SRV_LINKS = l || {};
+  try { localStorage.setItem('medash_links', JSON.stringify(SRV_LINKS)); } catch (e) { }
+}
+const shiftBase = () => LINKS.shift || SRV_LINKS.shift || '';
 function setModel(m, src, label) {
   S.model = m; S.source = src; S.sourceLabel = label;
   S.loadedAt = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
@@ -777,8 +787,8 @@ function shiftW(s) {
       <div class="h">担当する人（${md(day)} 出勤${role ? '・' + esc(role) : ''}）　複数選べます</div>
       <div class="opts">${cands.length ? cands.map(r => `<button class="${ed.sel.includes(r['氏名']) ? 'on' : ''}" data-act="tkpick" data-name="${esc(r['氏名'])}" aria-pressed="${ed.sel.includes(r['氏名'])}">${esc(r['氏名'])}<small>${esc(r['時間'])}</small></button>`).join('') : '<span class="muted">この日に出勤している人がいません</span>'}</div>
       <div class="acts"><span class="msg">${esc(ed.msg || '')}</span>
-        <button class="btn" data-act="tkcancel" ${S.busy ? 'disabled' : ''}>やめる</button>
-        <button class="btn pri-s" data-act="tksave" ${S.busy ? 'disabled' : ''}>${S.busy ? '保存中…' : '保存'}</button></div>
+        <span class="st-${ed.state || 'idle'}" role="status">${{ pending: '変更を保存します…', saving: '保存中…', saved: '✓ 保存しました' }[ed.state] || '押すとすぐ保存されます'}</span>
+        <button class="btn" data-act="tkcancel">閉じる</button></div>
     </div>`;
   };
   const first = (tks.find(r => !names(r).length) || tks[0] || {})['業務'];
@@ -800,34 +810,60 @@ function shiftW(s) {
   return { id: 'shift', title: '勤務・業務', icon: IC.shift, color: 'var(--accent)', level: noneToday ? 'warn' : '',
     mini: noneToday ? '<b class="lv-warn">未割当</b>' : `技士 <b>${ce ?? '—'}</b>`,
     summary: `<span class="w-k">技士 <b>${ce ?? '—'}</b>人</span><span class="w-k">サポーター <b>${sp ?? '—'}</b>人</span>${noneToday ? '<span class="w-k lv-warn">担当割りがまだありません</span>' : ''}`,
-    body, link: isAdminUser() && LINKS.shift ? [shiftAppUrl(), 'シフト管理へ'] : null };
+    body, link: isAdminUser() && shiftBase() ? [shiftAppUrl(), 'シフト管理へ'] : null };
 }
 const d0 = (d, today) => d === today ? '今日' : md(d) + '（' + wd(d) + '）';
 function shiftAppUrl() {
-  if (!LINKS.shift) return '';
-  return LINKS.shift + (LINKS.shift.includes('?') ? '&' : '?') + 't=' + encodeURIComponent(S.auth ? S.auth.token : '');
+  const base = shiftBase();
+  if (!base) return '';
+  return base + (base.includes('?') ? '&' : '?') + 't=' + encodeURIComponent(S.auth ? S.auth.token : '');
 }
 
-/* 担当割りの保存：集約用GAS → MEシフトのスプレッドシート */
-async function saveTask() {
+/* 担当割りの保存：押すたびに自動で保存（続けて押したときはまとめて1回）。集約用GAS → MEシフトのスプレッドシート */
+let tkTimer = null, tkSaving = false, tkAgain = null;
+function queueTaskSave() {
+  clearTimeout(tkTimer);
+  tkTimer = setTimeout(() => flushTaskSave(), 600);
+}
+/** 編集中の内容をすぐ保存（業務を切り替える・閉じるときにも呼ぶ） */
+function flushTaskSave() {
+  clearTimeout(tkTimer); tkTimer = null;
   const ed = S.tkEdit;
-  if (!ed || !S.auth) return;
-  const cur = rows('業務担当').find(r => r['日付'] === ed.date && r['業務'] === ed.task);
+  if (!ed || ed.state !== 'pending') return;
+  const job = { date: ed.date, task: ed.task, names: ed.sel.slice() };
+  if (tkSaving) { tkAgain = job; return; }
+  runTaskSave(job);
+}
+async function runTaskSave(job) {
+  if (!S.auth) return;
+  tkSaving = true;
+  const mine = () => S.tkEdit && S.tkEdit.date === job.date && S.tkEdit.task === job.task ? S.tkEdit : null;
+  if (mine()) { mine().state = 'saving'; mine().msg = ''; render(); }
+  const cur = rows('業務担当').find(r => r['日付'] === job.date && r['業務'] === job.task);
   const base = cur ? String(cur['担当'] || '').split('・').filter(Boolean) : [];
-  S.busy = true; ed.msg = ''; render();
   try {
     const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'assignTask', token: S.auth.token, date: ed.date, task: ed.task, names: ed.sel, base }) });
+      body: JSON.stringify({ action: 'assignTask', token: S.auth.token, date: job.date, task: job.task, names: job.names, base }) });
     const j = await r.json();
-    if (j.auth) { S.busy = false; S.tkEdit = null; logout('ログインの有効期限が切れました。もう一度ユーザー番号を入力してください'); return; }
+    if (j.auth) { tkSaving = false; S.tkEdit = null; logout('ログインの有効期限が切れました。もう一度ユーザー番号を入力してください'); return; }
     if (!j.ok) throw new Error(j.error || '保存できませんでした');
+    setLinks(j.links);
     setModel(j.data, 'api', '集約データ');
-    S.tkEdit = null;
+    const ed = mine();
+    if (ed && ed.state === 'saving') ed.state = 'saved';
   } catch (e) {
-    ed.msg = e.message === 'Failed to fetch' ? '通信できませんでした。電波を確認してください' : e.message;
-    if (/先に変更/.test(ed.msg)) { S.busy = false; await loadApi(false); const c = rows('業務担当').find(r => r['日付'] === ed.date && r['業務'] === ed.task); ed.sel = c ? String(c['担当'] || '').split('・').filter(Boolean) : []; }
+    const ed = mine();
+    const msg = e.message === 'Failed to fetch' ? '通信できませんでした。電波を確認してください' : e.message;
+    tkAgain = null;
+    await loadApi(false);
+    if (ed) {
+      const c = rows('業務担当').find(r => r['日付'] === job.date && r['業務'] === job.task);
+      ed.sel = c ? String(c['担当'] || '').split('・').filter(Boolean) : [];
+      ed.msg = msg; ed.state = '';
+    }
   }
-  S.busy = false;
+  tkSaving = false;
+  if (tkAgain) { const next = tkAgain; tkAgain = null; runTaskSave(next); return; }
   render();
 }
 
@@ -898,7 +934,7 @@ function renderNav() {
   const n = src => rows('要対応').filter(r => r['業務'] === src && r['緊急度'] !== '未実施').length;
   const items = [['dash', 'ダッシュボード', '#', 0, true], ['round', 'ラウンド点検', LINKS.round, S.model ? n('ラウンド') : 0], ['gas', '医療ガス点検', LINKS.gas, S.model ? n('医療ガス') : 0], ['stock', '在庫管理', LINKS.stock, S.model ? n('在庫') : 0]];
   // 管理者だけ：シフト管理（ダッシュボードの通行証を付けて開く。MEシフト側で管理者か確認する）
-  if (isAdminUser() && LINKS.shift) items.push(['shift', 'シフト管理', shiftAppUrl(), 0, false, true]);
+  if (isAdminUser() && shiftBase()) items.push(['shift', 'シフト管理', shiftAppUrl(), 0, false, true]);
   $('#nav').innerHTML = items.map(i => i[2]
     ? `<a href="${esc(i[2])}" ${i[4] ? 'aria-current="page"' : ''}${i[5] ? ' target="_blank" rel="noopener"' : ''}>${IC[i[0]]}<span>${i[1]}</span>${i[3] ? `<span class="cnt">${i[3]}</span>` : ''}</a>`
     : `<a class="off" aria-disabled="true" title="URL未設定">${IC[i[0]]}<span>${i[1]}</span><small>未設定</small></a>`).join('');
@@ -961,16 +997,21 @@ document.addEventListener('click', e => {
   else if (a === 'closeall') { OPEN.clear(); saveOpen(); render(); }
   else if (a === 'tologin') { S.model = null; S.source = ''; S.wantLogin = true; S.auth = loadAuth(); render(); if (S.auth) loadApi(false); }
   else if (a === 'xlsx') reopenExcel();
-  else if (a === 'shiftday') { S.shiftDay = Number(b.dataset.n) || 0; S.tkEdit = null; render(); }
+  else if (a === 'shiftday') { flushTaskSave(); S.shiftDay = Number(b.dataset.n) || 0; S.tkEdit = null; render(); }
   else if (a === 'tkedit' || a === 'tktask') {
+    flushTaskSave();
     const date = a === 'tkedit' ? b.dataset.date : S.tkEdit.date;
     const cur = rows('業務担当').find(r => r['日付'] === date && r['業務'] === b.dataset.task);
     S.tkEdit = { date, task: b.dataset.task, sel: cur ? String(cur['担当'] || '').split('・').filter(Boolean) : [], msg: '' };
     render();
   }
-  else if (a === 'tkpick') { const ed = S.tkEdit, n = b.dataset.name; ed.sel = ed.sel.includes(n) ? ed.sel.filter(x => x !== n) : ed.sel.concat([n]); render(); }
-  else if (a === 'tkcancel') { S.tkEdit = null; render(); }
-  else if (a === 'tksave') saveTask();
+  else if (a === 'tkpick') {
+    const ed = S.tkEdit, n = b.dataset.name;
+    ed.sel = ed.sel.includes(n) ? ed.sel.filter(x => x !== n) : ed.sel.concat([n]);
+    ed.state = 'pending'; ed.msg = '';
+    render(); queueTaskSave();
+  }
+  else if (a === 'tkcancel') { flushTaskSave(); S.tkEdit = null; render(); }
   else if (a === 'filter') { S.filter = b.dataset.f; S.showAll = false; render(); }
   else if (a === 'more') { S.showAll = true; render(); }
   else if (a === 'theme') {
